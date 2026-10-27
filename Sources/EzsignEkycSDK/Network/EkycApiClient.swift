@@ -100,7 +100,7 @@ final class EkycApiClient {
         let body: [String: Any] = [
             "phone": phone,
             "otpType": 1,
-            "menu": "register_update"
+            "menu": "register_phone_number_validation"
         ]
         let req = try makeRequest(path: "/otp/validatephone", jsonBody: body)
         let (data, res) = try await session.data(for: req)
