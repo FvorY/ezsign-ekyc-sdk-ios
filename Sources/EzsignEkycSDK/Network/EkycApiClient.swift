@@ -8,7 +8,20 @@ final class EkycApiClient {
     init(baseUrl: String, authToken: String) {
         let clean = baseUrl.trimmingCharacters(in: CharacterSet(charactersIn: "/ "))
         self.baseUrl = clean.hasSuffix("/api") ? clean : "\(clean)/api"
-        self.authToken = authToken.hasPrefix("Bearer ") ? authToken : "Bearer \(authToken)"
+
+        var cleanToken = authToken.trimmingCharacters(in: .whitespacesAndNewlines)
+        if cleanToken.hasPrefix("\"") && cleanToken.hasSuffix("\"") {
+            cleanToken = String(cleanToken.dropFirst().dropLast()).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        if cleanToken.lowercased().hasPrefix("bearer ") {
+            cleanToken = String(cleanToken.dropFirst(7)).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        cleanToken = cleanToken.replacingOccurrences(of: "\n", with: "")
+            .replacingOccurrences(of: "\r", with: "")
+            .replacingOccurrences(of: " ", with: "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        self.authToken = "Bearer \(cleanToken)"
         self.session = URLSession.shared
     }
 
@@ -21,6 +34,8 @@ final class EkycApiClient {
         request.httpMethod = method
         request.setValue(authToken, forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("ezSign-iOS", forHTTPHeaderField: "User-Agent")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
 
         if let jsonBody = jsonBody {
             request.httpBody = try JSONSerialization.data(withJSONObject: jsonBody, options: [])
@@ -35,14 +50,20 @@ final class EkycApiClient {
         let decoder = JSONDecoder()
         if let decoded = try? decoder.decode(ApiResponse<T>.self, from: data) {
             if decoded.code != 200 && decoded.code != 0 {
-                let msg = decoded.message ?? "Terjadi kesalahan pada server"
+                var msg = decoded.message ?? "Terjadi kesalahan pada server"
+                if msg.localizedCaseInsensitiveContains("JWT") || msg.localizedCaseInsensitiveContains("Unauthorized") {
+                    msg = "Sesi token tidak valid atau kadaluarsa (\(msg)). Pastikan token masih aktif dan Base URL sesuai environment akun Anda."
+                }
                 throw NSError(domain: "EkycApiClient", code: decoded.code, userInfo: [NSLocalizedDescriptionKey: msg])
             }
             return decoded
         }
 
         if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-            let msg = (json["message"] as? String) ?? (json["error"] as? String) ?? "Terjadi kesalahan pada server (HTTP \(statusCode))"
+            var msg = (json["message"] as? String) ?? (json["error"] as? String) ?? "Terjadi kesalahan pada server (HTTP \(statusCode))"
+            if msg.localizedCaseInsensitiveContains("JWT") || msg.localizedCaseInsensitiveContains("Unauthorized") {
+                msg = "Sesi token tidak valid atau kadaluarsa (\(msg)). Pastikan token masih aktif dan Base URL sesuai environment akun Anda."
+            }
             throw NSError(domain: "EkycApiClient", code: statusCode, userInfo: [NSLocalizedDescriptionKey: msg])
         }
 
