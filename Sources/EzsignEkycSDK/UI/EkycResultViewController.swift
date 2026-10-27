@@ -76,12 +76,14 @@ final class EkycResultViewController: UIViewController {
         guard let client = EkycSession.shared.client else { return }
 
         Task {
+            var failureCode = "LIVENESS_SUBMIT_FAILED"
             do {
                 _ = try await client.submitLiveness(
                     bizToken: EkycSession.shared.bizToken,
                     livenessId: EkycSession.shared.livenessId
                 )
 
+                failureCode = "UPDATE_PROFILE_FAILED"
                 _ = try await client.updateMobile(
                     nama: EkycSession.shared.nama,
                     nik: EkycSession.shared.nik,
@@ -104,7 +106,7 @@ final class EkycResultViewController: UIViewController {
             } catch {
                 await MainActor.run {
                     self.activityIndicator.stopAnimating()
-                    self.finalResult = .failure(errorCode: String((error as NSError).code), message: error.localizedDescription)
+                    self.finalResult = .failure(errorCode: failureCode, message: error.localizedDescription)
                     self.titleLabel.text = "Verification Failed"
                     self.descLabel.text = error.localizedDescription
                     self.finishButton.setTitle("Close", for: .normal)

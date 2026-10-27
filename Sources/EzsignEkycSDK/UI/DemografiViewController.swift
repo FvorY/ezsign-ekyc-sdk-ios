@@ -149,8 +149,13 @@ final class DemografiViewController: UIViewController {
             do {
                 let res = try await client.getEkycStatus()
                 if res.data?.canEkyc == false {
-                    showAlert(title: "Perhatian", message: res.message ?? "Akun tidak dapat melakukan eKYC") {
-                        self.dismiss(animated: true)
+                    let message = res.message ?? "Akun tidak dapat melakukan eKYC"
+                    showAlert(title: "Perhatian", message: message) {
+                        let completion = EkycSession.shared.completion
+                        self.dismiss(animated: true) {
+                            completion?(.failure(errorCode: "EKYC_NOT_ALLOWED", message: message))
+                            EkycSession.shared.reset()
+                        }
                     }
                 }
             } catch {

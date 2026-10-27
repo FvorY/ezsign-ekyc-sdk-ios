@@ -224,7 +224,7 @@ final class LivenessInstructionViewController: UIViewController {
             startCallBack: { error, extra in
                 if let err = error, err.errorCode.rawValue != 1000 {
                     DispatchQueue.main.async {
-                        self.showAlert(title: "Liveness Error", message: err.errorMessage.isEmpty ? "Gagal memulai deteksi wajah." : err.errorMessage)
+                        self.showAlert(title: "Liveness Error", message: self.describeStartError(err.errorMessage))
                     }
                 }
             },
@@ -244,6 +244,16 @@ final class LivenessInstructionViewController: UIViewController {
             },
             dismissCallBack: {}
         )
+    }
+
+    // Megvii validates its license against the host app's bundle ID. AUTHENTICATION_FAIL /
+    // bundleid_error means that bundle ID is not registered for the ezSign Megvii account.
+    private func describeStartError(_ message: String) -> String {
+        let raw = message.isEmpty ? "Gagal memulai deteksi wajah." : message
+        let upper = raw.uppercased()
+        guard upper.contains("AUTHENTICATION_FAIL") || upper.contains("BUNDLEID") else { return raw }
+        let bundleId = Bundle.main.bundleIdentifier ?? "-"
+        return "Lisensi liveness menolak aplikasi \(bundleId). Bundle ID ini harus didaftarkan pada akun Megvii ezSign. (\(raw))"
     }
 
     private func loadImage(named: String) -> UIImage? {
