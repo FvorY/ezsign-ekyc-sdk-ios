@@ -1,0 +1,65 @@
+/*
+ Localizable.strings
+ MGFaceIDDetect
+
+ Created by Megvii on 2021/10/10.
+ Copyright © 2017年 megvii. All rights reserved.
+ */
+
+//  FaceID活体检测
+"livenessHomePromptBlinkText"                 =           "Blink";
+"livenessHomePromptOpenMouthText"                 =           "Open your mouth";
+"livenessHomePromptShakeHeadText"                 =           "Shake your head";
+"livenessHomePromptNodText"                 =           "Nod";
+"livenessHomePromptFrontalFaceText" = "Align your face within the face frame";
+"livenessHomePromptFrontalEyeText" = "Align your eyes within the guide frame";
+"livenessHomePromptDarkerText" = "The face is too bright";
+"livenessHomePromptBrighterText" = "The face is too dark";
+"livenessHomePromptCloserText" = "Get closer";
+"livenessHomePromptFurtherText" = "Get further away";
+"livenessHomePromptFrontalFaceInBoundingBoxText" = "Align your face within the face frame";
+"livenessHomePromptNoEyesOcclusionText" = "Do not cover your eyes";
+"livenessHomePromptNoMouthOcclusionText" = "do not cover your mouth";
+"livenessHomePromptStayStillText" = "Stay still";
+"livenessHomePromptTooBrightText" = "The light is too bright, please go to a darker environment";
+"livenessHomePromptAngleOffsetText" = "Please keep your head angle straight";
+"livenessHomePromptMotionBlurText" = "Please keep the capture clear";
+"livenessHomePromptGaussianBlurText" = "Please keep the capture clear";
+"livenessHomePromptVerticalText"                 =           "Please keep the phone vertical";
+"livenessHomeExitPopupwindowTitleText" = "Prompt";
+"livenessHomeExitPopupwindowBodyText" = "exit the verification?";
+"livenessHomeExitPopupwindowSureText" = "Confirm";
+"livenessHomeExitPopupwindowCancelText" = "Cancel";
+"livenessHomePromptCheckMultiFaceText" = "Ensure that only one person is detected";
+"livenessHomePromptEnvDarkerText" = "The light is too dark, please go to a brighter environment";
+"livenessHomePromptEnvBrighterText" = "The light is too bright, please go to a darker environment";
+"livenessHomePromptFaceEreaText" = "The face detection area is too small";
+"livenessHomePromptWaitText"                 =           "Stay on your position";
+"livenessHomeAgreementText" = "User agreement";
+"livenessHomeCreditText" = "Personal credit information notice";
+"livenessHomeAgreementpageTopTitleText" = "Face liveness verification";
+"livenessHomeAgreementpageBottomTitleText" = "Align your face within the face frame";
+"livenessHomeAgreementpageBottomButtonText" = "Start";
+"livenessHomeScrnAuthorizedRejectText"                 =           "This service requires screen recording permission, please restart and allow recording permission or contact the platform's customer service";
+"livenessHomeScrnAuthorizedRejectButtonText"                 =           "OK";
+"livenessHomeCloserPromptText" = "Move closer to the screen and re-align your face within the face frame";
+"livenessHomeCloserPromptImageText" = "Move the phone closer";
+"livenessHomeLoadingpageText" = "Configuration loading, please wait";
+"livenessHomePromptCorrectActionText"                 =           "Inconsistent with the prompt action";
+"livenessHomePromptCoherenceText"                     =           "Inconsistent actions";
+"livenessHomePromptFaceLocationText"                  =           "Please keep your face within the face frame";
+"livenessHomePromptActionSpeedText"                   =           "Action speed is too fast";
+"livenessHomePromptMaskText"                          =           "Please remove your mask";
+"livenessHomePromptFaceLostText"                      =           "Please keep your face within the face frame";
+"livenessHomePromptNoFaceText"                        =           "Please keep your face within the face frame";
+"livenessHomePromptOcclusionText"                     =           "Please avoid covering your face";
+
+"livenessHomeDynamicActionTimeOutText"                =           "Action timeout, please try again";
+"livenessHomeDynamicActionWrongText"                  =           "Action error. Please try again.";
+"livenessHomeDynamicActionPromptText"                 =           "Spiritual Living Action Living Stage Tips";
+"livenessHomeDynamicFlashPromptText"                  =           "Spiritual Living Dazzling Living Stage Tips";
+"livenessHomeDynamicBlinkText"                        =           "Blink, please.";
+"livenessHomeDynamicOpenMouthText"                    =           "Please open your mouth.";
+"livenessHomeDynamicShakeHeadText"                    =           "Please shake your head.";
+"livenessHomeDynamicNodText"                          =           "Please nod your head.";
+"livenessHomePromptText"                              =           "Global Tips"; //  最多支持三行显示，请使用`\n`进行控制换行操作

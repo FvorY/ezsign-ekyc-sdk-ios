@@ -1,0 +1,6 @@
+framework module MegLiveV5Detect {
+  umbrella header "MegLiveV5Detect.h"
+
+  export *
+  module * { export * }
+}
