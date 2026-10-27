@@ -17,7 +17,7 @@ final class BackgroundShapeView: UIView {
 
     override func draw(_ rect: CGRect) {
         let w = rect.width
-        let h = rect.height
+        let h: CGFloat = 400
 
         // Lower curve shadow
         let shadowPath = UIBezierPath()

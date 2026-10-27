@@ -26,10 +26,11 @@ final class OtpViewController: UIViewController {
     }
 
     private func setupUI() {
-        view.backgroundColor = UIColor(red: 0xF5/255.0, green: 0xF6/255.0, blue: 0xFA/255.0, alpha: 1.0)
+        view.backgroundColor = .white
+        overrideUserInterfaceStyle = .light
         title = "Verification Phone"
 
-        let shape = BackgroundShapeView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 260))
+        let shape = BackgroundShapeView(frame: CGRect(x: 0, y: -view.safeAreaInsets.top, width: view.bounds.width, height: 430))
         shape.autoresizingMask = [.flexibleWidth]
         view.addSubview(shape)
 
@@ -46,11 +47,12 @@ final class OtpViewController: UIViewController {
         cardView.layer.masksToBounds = true
 
         titleLabel.text = "Verification Phone"
-        titleLabel.font = .boldSystemFont(ofSize: 17)
+        titleLabel.font = EkycStyle.font(size: 17, weight: .bold)
         titleLabel.textColor = UIColor(red: 0x7B/255.0, green: 0x7B/255.0, blue: 0x7B/255.0, alpha: 1.0)
 
+        subtitleLabel.numberOfLines = 0
         subtitleLabel.text = "Enter your active phone number to receive OTP code"
-        subtitleLabel.font = .systemFont(ofSize: 12)
+        subtitleLabel.font = EkycStyle.font(size: 12)
         subtitleLabel.textColor = UIColor(red: 0x7B/255.0, green: 0x7B/255.0, blue: 0x7B/255.0, alpha: 1.0)
 
         configureTextField(phoneField, placeholder: "Phone Number", keyboardType: .phonePad)
@@ -61,7 +63,7 @@ final class OtpViewController: UIViewController {
         sendOtpButton.layer.borderWidth = 1
         sendOtpButton.layer.borderColor = UIColor(red: 0x15/255.0, green: 0xC1/255.0, blue: 0xE7/255.0, alpha: 1.0).cgColor
         sendOtpButton.layer.cornerRadius = 8
-        sendOtpButton.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
+        sendOtpButton.titleLabel?.font = EkycStyle.font(size: 13, weight: .semibold)
         sendOtpButton.addTarget(self, action: #selector(onSendOtpTapped), for: .touchUpInside)
 
         let phoneRow = UIStackView(arrangedSubviews: [phoneField, sendOtpButton])
@@ -69,7 +71,7 @@ final class OtpViewController: UIViewController {
         phoneRow.spacing = 8
         sendOtpButton.widthAnchor.constraint(equalToConstant: 95).isActive = true
 
-        timerLabel.font = .systemFont(ofSize: 12)
+        timerLabel.font = EkycStyle.font(size: 12)
         timerLabel.textColor = UIColor(red: 0x7B/255.0, green: 0x7B/255.0, blue: 0x7B/255.0, alpha: 1.0)
         timerLabel.isHidden = true
 
@@ -77,9 +79,9 @@ final class OtpViewController: UIViewController {
 
         verifyButton.setTitle("Continue", for: .normal)
         verifyButton.setTitleColor(.white, for: .normal)
-        verifyButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+        verifyButton.titleLabel?.font = EkycStyle.font(size: 14, weight: .medium)
         verifyButton.backgroundColor = UIColor(red: 0x15/255.0, green: 0xC1/255.0, blue: 0xE7/255.0, alpha: 1.0)
-        verifyButton.layer.cornerRadius = 12
+        verifyButton.layer.cornerRadius = 25
         verifyButton.addTarget(self, action: #selector(onVerifyTapped), for: .touchUpInside)
 
         let stack = UIStackView(arrangedSubviews: [
@@ -107,7 +109,7 @@ final class OtpViewController: UIViewController {
             cardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15),
             cardView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20),
 
-            verifyButton.heightAnchor.constraint(equalToConstant: 52),
+            verifyButton.heightAnchor.constraint(equalToConstant: 50),
 
             stack.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 20),
             stack.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 20),
@@ -118,6 +120,7 @@ final class OtpViewController: UIViewController {
 
     private func configureTextField(_ tf: UITextField, placeholder: String, keyboardType: UIKeyboardType = .default) {
         tf.placeholder = placeholder
+        EkycStyle.configureField(tf)
         tf.keyboardType = keyboardType
         tf.borderStyle = .none
         tf.layer.cornerRadius = 8

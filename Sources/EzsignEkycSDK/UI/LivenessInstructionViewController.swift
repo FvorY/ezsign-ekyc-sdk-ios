@@ -21,10 +21,11 @@ final class LivenessInstructionViewController: UIViewController {
     }
 
     private func setupUI() {
-        view.backgroundColor = UIColor(red: 0xF5/255.0, green: 0xF6/255.0, blue: 0xFA/255.0, alpha: 1.0)
+        view.backgroundColor = .white
+        overrideUserInterfaceStyle = .light
         title = "Active Liveness Check"
 
-        let shape = BackgroundShapeView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 260))
+        let shape = BackgroundShapeView(frame: CGRect(x: 0, y: -view.safeAreaInsets.top, width: view.bounds.width, height: 430))
         shape.autoresizingMask = [.flexibleWidth]
         view.addSubview(shape)
 
@@ -41,15 +42,17 @@ final class LivenessInstructionViewController: UIViewController {
         cardView.layer.masksToBounds = true
 
         titleLabel.text = "Preparation Before Active Liveness Check"
-        titleLabel.font = .boldSystemFont(ofSize: 14)
+        titleLabel.font = EkycStyle.font(size: 14, weight: .medium)
+        titleLabel.numberOfLines = 0
         titleLabel.textColor = UIColor(red: 0x5D/255.0, green: 0x5D/255.0, blue: 0x5D/255.0, alpha: 1.0)
         titleLabel.textAlignment = .center
 
         illustrationView.contentMode = .scaleAspectFit
         illustrationView.image = loadImage(named: "pre_active_liveness")
 
+        promptLabel.numberOfLines = 0
         promptLabel.text = "For the best verification results, please make sure that:"
-        promptLabel.font = .systemFont(ofSize: 12, weight: .medium)
+        promptLabel.font = EkycStyle.font(size: 12, weight: .medium)
         promptLabel.textColor = UIColor(red: 0x7B/255.0, green: 0x7B/255.0, blue: 0x7B/255.0, alpha: 1.0)
 
         let item1 = createChecklistItem(number: "1", title: "Lighting is good", desc: "Stay in a well-lit room and avoid strong backlight")
@@ -59,23 +62,27 @@ final class LivenessInstructionViewController: UIViewController {
         let item5 = createChecklistItem(number: "5", title: "Follow the instructions", desc: "you may be asked to perform certain actions (e.g., turn your head, blink, or smile)")
 
         let footerLabel = UILabel()
+        footerLabel.numberOfLines = 0
         footerLabel.text = "When you are ready, select “Start Liveness” to proceed"
-        footerLabel.font = .systemFont(ofSize: 12)
+        footerLabel.font = EkycStyle.font(size: 12)
         footerLabel.textColor = UIColor(red: 0xAA/255.0, green: 0xAA/255.0, blue: 0xAA/255.0, alpha: 1.0)
         footerLabel.textAlignment = .center
 
         startButton.setTitle("Start Liveness", for: .normal)
         startButton.setTitleColor(.white, for: .normal)
-        startButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+        startButton.titleLabel?.font = EkycStyle.font(size: 14, weight: .medium)
         startButton.backgroundColor = UIColor(red: 0x15/255.0, green: 0xC1/255.0, blue: 0xE7/255.0, alpha: 1.0)
-        startButton.layer.cornerRadius = 12
+        startButton.layer.cornerRadius = 25
         startButton.addTarget(self, action: #selector(onStartTapped), for: .touchUpInside)
 
         let stack = UIStackView(arrangedSubviews: [
             titleLabel, illustrationView, promptLabel, item1, item2, item3, item4, item5, footerLabel, activityIndicator, startButton
         ])
         stack.axis = .vertical
-        stack.spacing = 14
+        stack.spacing = 16
+        stack.setCustomSpacing(60, after: titleLabel)
+        stack.setCustomSpacing(60, after: illustrationView)
+        stack.setCustomSpacing(28, after: item5)
         stack.translatesAutoresizingMaskIntoConstraints = false
         cardView.addSubview(stack)
 
@@ -91,13 +98,13 @@ final class LivenessInstructionViewController: UIViewController {
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
 
-            cardView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 15),
+            cardView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 24),
             cardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 19),
             cardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -19),
             cardView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20),
 
-            illustrationView.heightAnchor.constraint(equalToConstant: 120),
-            startButton.heightAnchor.constraint(equalToConstant: 52),
+            illustrationView.heightAnchor.constraint(equalToConstant: 136),
+            startButton.heightAnchor.constraint(equalToConstant: 50),
 
             stack.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 20),
             stack.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 20),
@@ -112,7 +119,7 @@ final class LivenessInstructionViewController: UIViewController {
         let badge = UILabel()
         badge.text = number
         badge.textColor = .white
-        badge.font = .boldSystemFont(ofSize: 14)
+        badge.font = EkycStyle.font(size: 14, weight: .bold)
         badge.textAlignment = .center
         badge.backgroundColor = UIColor(red: 0x15/255.0, green: 0xC1/255.0, blue: 0xE7/255.0, alpha: 1.0)
         badge.layer.cornerRadius = 14
@@ -121,12 +128,12 @@ final class LivenessInstructionViewController: UIViewController {
 
         let titleLbl = UILabel()
         titleLbl.text = title
-        titleLbl.font = .boldSystemFont(ofSize: 12)
+        titleLbl.font = EkycStyle.font(size: 12, weight: .bold)
         titleLbl.textColor = UIColor(red: 0x7B/255.0, green: 0x7B/255.0, blue: 0x7B/255.0, alpha: 1.0)
 
         let descLbl = UILabel()
         descLbl.text = desc
-        descLbl.font = .systemFont(ofSize: 12)
+        descLbl.font = EkycStyle.font(size: 12)
         descLbl.textColor = UIColor(red: 0xAA/255.0, green: 0xAA/255.0, blue: 0xAA/255.0, alpha: 1.0)
         descLbl.numberOfLines = 0
 
@@ -208,6 +215,7 @@ final class LivenessInstructionViewController: UIViewController {
         let config = MegLiveV5DetectInitConfigItem()
         config.phoneVertical = MegLiveV5DetectPhoneVerticalTypeDisable
         config.hostURL = "https://api-idn.megvii.com"
+        config.bundleFilePath = EkycStyle.bundle.path(forResource: "MegLiveV5Detect", ofType: "bundle") ?? ""
 
         MegLiveV5DetectManager.megFaceIDLive(
             withBizToken: bizToken,
@@ -239,14 +247,7 @@ final class LivenessInstructionViewController: UIViewController {
     }
 
     private func loadImage(named: String) -> UIImage? {
-        let bundle = Bundle(for: type(of: self))
-        if let path = bundle.path(forResource: named, ofType: "png") {
-            return UIImage(contentsOfFile: path)
-        }
-        if let mainPath = Bundle.main.path(forResource: named, ofType: "png") {
-            return UIImage(contentsOfFile: mainPath)
-        }
-        return UIImage(named: named)
+        EkycStyle.image(named: named)
     }
 
     private func showAlert(title: String, message: String) {

@@ -15,9 +15,15 @@ let package = Package(
                 "MegLiveV5Detect",
                 "MGFaceIDBaseKit"
             ],
-            path: "Sources/EzsignEkycSDK",
+            path: ".",
+            exclude: ["Example", "Frameworks", "README.md", "LICENSE", "EzsignEkycSDK.podspec"],
+            sources: ["Sources/EzsignEkycSDK"],
             resources: [
-                .process("../../Resources")
+                .process("Resources/identity.png"),
+                .process("Resources/pre_active_liveness.png"),
+                .process("Resources/InterVariable.ttf"),
+                .process("Resources/EkycAssets.xcassets"),
+                .copy("Resources/MegLiveV5Detect.bundle")
             ]
         ),
         .binaryTarget(

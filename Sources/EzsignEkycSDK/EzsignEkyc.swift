@@ -25,12 +25,13 @@ public final class EzsignEkyc {
         let demografiVC = DemografiViewController()
         let navController = UINavigationController(rootViewController: demografiVC)
         navController.modalPresentationStyle = .fullScreen
+        navController.overrideUserInterfaceStyle = .light
 
         // Setup custom nav bar appearance matching Flutter info color
         let navBarAppearance = UINavigationBarAppearance()
         navBarAppearance.configureWithOpaqueBackground()
         navBarAppearance.backgroundColor = UIColor(red: 0x55/255.0, green: 0xC9/255.0, blue: 0xE9/255.0, alpha: 1.0)
-        navBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        navBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.white, .font: EkycStyle.font(size: 18)]
         navController.navigationBar.standardAppearance = navBarAppearance
         navController.navigationBar.scrollEdgeAppearance = navBarAppearance
         navController.navigationBar.tintColor = .white

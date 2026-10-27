@@ -49,12 +49,12 @@ final class EkycApiClient {
 
         let decoder = JSONDecoder()
         if let decoded = try? decoder.decode(ApiResponse<T>.self, from: data) {
-            if decoded.code != 200 && decoded.code != 0 {
+            if !(200..<300).contains(statusCode) || (decoded.code != 200 && decoded.code != 0) {
                 var msg = decoded.message ?? "Terjadi kesalahan pada server"
                 if msg.localizedCaseInsensitiveContains("JWT") || msg.localizedCaseInsensitiveContains("Unauthorized") {
                     msg = "Sesi token tidak valid atau kadaluarsa (\(msg)). Pastikan token masih aktif dan Base URL sesuai environment akun Anda."
                 }
-                throw NSError(domain: "EkycApiClient", code: decoded.code, userInfo: [NSLocalizedDescriptionKey: msg])
+                throw NSError(domain: "EkycApiClient", code: (200..<300).contains(statusCode) ? decoded.code : statusCode, userInfo: [NSLocalizedDescriptionKey: msg])
             }
             return decoded
         }
@@ -154,8 +154,8 @@ final class EkycApiClient {
         return try parseResponse(data, response: res)
     }
 
-    func updateMobile(nama: String, nik: String, birthDate: String, phone: String, otp: String, bizToken: String) async throws -> ApiResponse<EmptyData> {
-        let body: [String: Any] = [
+    func updateMobile(nama: String, nik: String, birthDate: String, phone: String, otp: String, bizToken: String, verifyToken: String? = nil) async throws -> ApiResponse<EmptyData> {
+        var body: [String: Any] = [
             "nama": nama,
             "nik": nik,
             "birthDate": birthDate,
@@ -163,13 +163,16 @@ final class EkycApiClient {
             "otp": otp,
             "bizToken": bizToken
         ]
+        if let verifyToken = verifyToken {
+            body["token"] = verifyToken
+        }
         let req = try makeRequest(path: "/register/update-mobile", jsonBody: body)
         let (data, res) = try await session.data(for: req)
         return try parseResponse(data, response: res)
     }
 
     func refreshAuth() async throws -> ApiResponse<AuthRefreshData> {
-        let req = try makeRequest(path: "/auth/refresh")
+        let req = try makeRequest(path: "/auth/user/refresh")
         let (data, res) = try await session.data(for: req)
         return try parseResponse(data, response: res)
     }

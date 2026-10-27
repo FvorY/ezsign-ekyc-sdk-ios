@@ -31,10 +31,11 @@ final class DemografiViewController: UIViewController {
     }
 
     private func setupUI() {
-        view.backgroundColor = UIColor(red: 0xF5/255.0, green: 0xF6/255.0, blue: 0xFA/255.0, alpha: 1.0)
-        title = EkycSession.shared.config?.title ?? "Verifikasi Identitas"
+        view.backgroundColor = .white
+        overrideUserInterfaceStyle = .light
+        title = EkycSession.shared.config?.title ?? "Your Identity"
 
-        let shape = BackgroundShapeView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 260))
+        let shape = BackgroundShapeView(frame: CGRect(x: 0, y: -view.safeAreaInsets.top, width: view.bounds.width, height: 430))
         shape.autoresizingMask = [.flexibleWidth]
         view.addSubview(shape)
 
@@ -51,19 +52,24 @@ final class DemografiViewController: UIViewController {
         cardView.layer.masksToBounds = true
 
         imageView.contentMode = .scaleAspectFit
+        imageView.layer.magnificationFilter = .linear
         imageView.image = loadImage(named: "identity")
 
         titleLabel.text = "Personal Data"
-        titleLabel.font = .boldSystemFont(ofSize: 17)
+        titleLabel.font = EkycStyle.font(size: 17, weight: .bold)
         titleLabel.textColor = UIColor(red: 0x7B/255.0, green: 0x7B/255.0, blue: 0x7B/255.0, alpha: 1.0)
 
         subtitleLabel.text = "Enter your personal data correctly"
-        subtitleLabel.font = .systemFont(ofSize: 12)
+        subtitleLabel.font = EkycStyle.font(size: 12)
         subtitleLabel.textColor = UIColor(red: 0x7B/255.0, green: 0x7B/255.0, blue: 0x7B/255.0, alpha: 1.0)
 
         configureTextField(nikField, placeholder: "Identity Number", keyboardType: .numberPad)
         configureTextField(nameField, placeholder: "Fullname", autocapitalization: .words)
         configureTextField(birthDateField, placeholder: "Date of Birth")
+
+        EkycStyle.configureField(nikField, icon: "Paper")
+        EkycStyle.configureField(nameField, icon: "Profile")
+        EkycStyle.configureField(birthDateField, icon: "Calendar")
 
         datePicker.datePickerMode = .date
         if #available(iOS 13.4, *) {
@@ -74,16 +80,21 @@ final class DemografiViewController: UIViewController {
 
         continueButton.setTitle("Continue", for: .normal)
         continueButton.setTitleColor(.white, for: .normal)
-        continueButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+        continueButton.titleLabel?.font = EkycStyle.font(size: 14, weight: .medium)
         continueButton.backgroundColor = UIColor(red: 0x15/255.0, green: 0xC1/255.0, blue: 0xE7/255.0, alpha: 1.0)
-        continueButton.layer.cornerRadius = 12
+        continueButton.layer.cornerRadius = 25
         continueButton.addTarget(self, action: #selector(onContinueTapped), for: .touchUpInside)
+
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.isHidden = true
 
         let stack = UIStackView(arrangedSubviews: [
             imageView, titleLabel, subtitleLabel, nikField, nameField, birthDateField, activityIndicator, continueButton
         ])
         stack.axis = .vertical
         stack.spacing = 15
+        stack.setCustomSpacing(10, after: imageView)
+        stack.setCustomSpacing(2, after: titleLabel)
         stack.translatesAutoresizingMaskIntoConstraints = false
         cardView.addSubview(stack)
 
@@ -104,8 +115,8 @@ final class DemografiViewController: UIViewController {
             cardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -15),
             cardView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20),
 
-            imageView.heightAnchor.constraint(equalToConstant: 130),
-            continueButton.heightAnchor.constraint(equalToConstant: 52),
+            imageView.heightAnchor.constraint(equalToConstant: 210),
+            continueButton.heightAnchor.constraint(equalToConstant: 50),
 
             stack.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 20),
             stack.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 20),
@@ -116,6 +127,7 @@ final class DemografiViewController: UIViewController {
 
     private func configureTextField(_ tf: UITextField, placeholder: String, keyboardType: UIKeyboardType = .default, autocapitalization: UITextAutocapitalizationType = .none) {
         tf.placeholder = placeholder
+        EkycStyle.configureField(tf)
         tf.keyboardType = keyboardType
         tf.autocapitalizationType = autocapitalization
         tf.borderStyle = .none
@@ -179,6 +191,7 @@ final class DemografiViewController: UIViewController {
 
     private func submitDemografi(nik: String, name: String, birthDate: String) {
         guard let client = EkycSession.shared.client else { return }
+        activityIndicator.isHidden = false
         activityIndicator.startAnimating()
         continueButton.isEnabled = false
 
@@ -187,6 +200,7 @@ final class DemografiViewController: UIViewController {
                 _ = try await client.checkDemografi(nama: name, nik: nik, birthDate: birthDate)
                 await MainActor.run {
                     self.activityIndicator.stopAnimating()
+                    self.activityIndicator.isHidden = true
                     self.continueButton.isEnabled = true
                     EkycSession.shared.nik = nik
                     EkycSession.shared.nama = name
@@ -198,6 +212,7 @@ final class DemografiViewController: UIViewController {
             } catch {
                 await MainActor.run {
                     self.activityIndicator.stopAnimating()
+                    self.activityIndicator.isHidden = true
                     self.continueButton.isEnabled = true
                     self.showAlert(title: "Gagal", message: error.localizedDescription)
                 }
@@ -214,14 +229,7 @@ final class DemografiViewController: UIViewController {
     }
 
     private func loadImage(named: String) -> UIImage? {
-        let bundle = Bundle(for: type(of: self))
-        if let path = bundle.path(forResource: named, ofType: "png") {
-            return UIImage(contentsOfFile: path)
-        }
-        if let mainPath = Bundle.main.path(forResource: named, ofType: "png") {
-            return UIImage(contentsOfFile: mainPath)
-        }
-        return UIImage(named: named)
+        EkycStyle.image(named: named)
     }
 
     private func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
