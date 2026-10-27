@@ -51,9 +51,7 @@ final class DemografiViewController: UIViewController {
         cardView.layer.masksToBounds = true
 
         imageView.contentMode = .scaleAspectFit
-        if let imagePath = Bundle(for: type(of: self)).path(forResource: "identity", ofType: "png") {
-            imageView.image = UIImage(contentsOfFile: imagePath)
-        }
+        imageView.image = loadImage(named: "identity")
 
         titleLabel.text = "Personal Data"
         titleLabel.font = .boldSystemFont(ofSize: 17)
@@ -205,6 +203,25 @@ final class DemografiViewController: UIViewController {
                 }
             }
         }
+    }
+
+    @objc func onCloseTapped() {
+        let completion = EkycSession.shared.completion
+        dismiss(animated: true) {
+            completion?(.cancelled)
+            EkycSession.shared.reset()
+        }
+    }
+
+    private func loadImage(named: String) -> UIImage? {
+        let bundle = Bundle(for: type(of: self))
+        if let path = bundle.path(forResource: named, ofType: "png") {
+            return UIImage(contentsOfFile: path)
+        }
+        if let mainPath = Bundle.main.path(forResource: named, ofType: "png") {
+            return UIImage(contentsOfFile: mainPath)
+        }
+        return UIImage(named: named)
     }
 
     private func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {

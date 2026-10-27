@@ -46,9 +46,7 @@ final class LivenessInstructionViewController: UIViewController {
         titleLabel.textAlignment = .center
 
         illustrationView.contentMode = .scaleAspectFit
-        if let path = Bundle(for: type(of: self)).path(forResource: "pre_active_liveness", ofType: "png") {
-            illustrationView.image = UIImage(contentsOfFile: path)
-        }
+        illustrationView.image = loadImage(named: "pre_active_liveness")
 
         promptLabel.text = "For the best verification results, please make sure that:"
         promptLabel.font = .systemFont(ofSize: 12, weight: .medium)
@@ -218,7 +216,7 @@ final class LivenessInstructionViewController: UIViewController {
             startCallBack: { error, extra in
                 if let err = error, err.errorCode.rawValue != 1000 {
                     DispatchQueue.main.async {
-                        self.showAlert(title: "Liveness Error", message: err.errorMessage ?? "Gagal memulai deteksi wajah.")
+                        self.showAlert(title: "Liveness Error", message: err.errorMessage.isEmpty ? "Gagal memulai deteksi wajah." : err.errorMessage)
                     }
                 }
             },
@@ -238,6 +236,17 @@ final class LivenessInstructionViewController: UIViewController {
             },
             dismissCallBack: {}
         )
+    }
+
+    private func loadImage(named: String) -> UIImage? {
+        let bundle = Bundle(for: type(of: self))
+        if let path = bundle.path(forResource: named, ofType: "png") {
+            return UIImage(contentsOfFile: path)
+        }
+        if let mainPath = Bundle.main.path(forResource: named, ofType: "png") {
+            return UIImage(contentsOfFile: mainPath)
+        }
+        return UIImage(named: named)
     }
 
     private func showAlert(title: String, message: String) {

@@ -38,15 +38,9 @@ public final class EzsignEkyc {
         demografiVC.navigationItem.leftBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .close,
             target: demografiVC,
-            action: #selector(closeTapped)
+            action: #selector(DemografiViewController.onCloseTapped)
         )
 
         presenter.present(navController, animated: true)
-    }
-
-    @objc private static func closeTapped() {
-        let completion = EkycSession.shared.completion
-        EkycSession.shared.reset()
-        completion?(.cancelled)
     }
 }
