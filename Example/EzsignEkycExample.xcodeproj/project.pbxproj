@@ -7,16 +7,30 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		13E88BFE653D5ACF5E2D8E6B /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC596E590AAA007834173C41 /* ReplayKit.framework */; };
+		1F066C031B12F38A9B2B4B6A /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28354C0A5B5005EB18BF263C /* AVFoundation.framework */; };
+		2697B2FD956B5FAA33043752 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F890CE8623DBAB32382CE43D /* SystemConfiguration.framework */; };
+		7AEB777D80FDD481CB01C04E /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7D6EE25364CDE2BA4CD797B /* CoreMedia.framework */; };
+		85C0BFF72331051A3C81049D /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E5BBBDA9A53F6D5634EF5FC3 /* CoreMotion.framework */; };
+		9D9182F20D673776FCCD8B2E /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E0E588E3F15917599FB633E6 /* MediaPlayer.framework */; };
 		AEBBA71E6372572DE313C450 /* EzsignEkycSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 1596D48F023E4DA4B97C9755 /* EzsignEkycSDK */; };
 		DD0C224D08323AF871639387 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70011228C6DAAAA981003D5 /* ViewController.swift */; };
+		E6BCD727D4A117291FA2E4DD /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ABE1AD7A9DE341349A018FF2 /* WebKit.framework */; };
 		EE7814B0FEFD3F9067FE28DF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4140722D23CE6A9940B39928 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		28354C0A5B5005EB18BF263C /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		4140722D23CE6A9940B39928 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		ABE1AD7A9DE341349A018FF2 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		AC596E590AAA007834173C41 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
 		B70011228C6DAAAA981003D5 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		C7D6EE25364CDE2BA4CD797B /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		DE1D62763D076DBC12642C06 /* ezsign-ekyc-sdk-ios */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "ezsign-ekyc-sdk-ios"; path = ..; sourceTree = SOURCE_ROOT; };
+		E0E588E3F15917599FB633E6 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		E5BBBDA9A53F6D5634EF5FC3 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		EF760CA77B3416C848F15B34 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		F890CE8623DBAB32382CE43D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		FA98790A0914A4DDE3ABCF4F /* EzsignEkycExample.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = EzsignEkycExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -26,6 +40,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				AEBBA71E6372572DE313C450 /* EzsignEkycSDK in Frameworks */,
+				85C0BFF72331051A3C81049D /* CoreMotion.framework in Frameworks */,
+				9D9182F20D673776FCCD8B2E /* MediaPlayer.framework in Frameworks */,
+				13E88BFE653D5ACF5E2D8E6B /* ReplayKit.framework in Frameworks */,
+				E6BCD727D4A117291FA2E4DD /* WebKit.framework in Frameworks */,
+				2697B2FD956B5FAA33043752 /* SystemConfiguration.framework in Frameworks */,
+				1F066C031B12F38A9B2B4B6A /* AVFoundation.framework in Frameworks */,
+				7AEB777D80FDD481CB01C04E /* CoreMedia.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,6 +76,7 @@
 			children = (
 				1AC21BB1AD2AB70114C5E939 /* EzsignEkycExample */,
 				7A78274EB028A38C78F648C1 /* Packages */,
+				F60AD8AB5DA9EEEB2E8F6D73 /* Frameworks */,
 				C7D25A491FB015FAE1ED2C8B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -65,6 +87,20 @@
 				FA98790A0914A4DDE3ABCF4F /* EzsignEkycExample.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		F60AD8AB5DA9EEEB2E8F6D73 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				28354C0A5B5005EB18BF263C /* AVFoundation.framework */,
+				C7D6EE25364CDE2BA4CD797B /* CoreMedia.framework */,
+				E5BBBDA9A53F6D5634EF5FC3 /* CoreMotion.framework */,
+				E0E588E3F15917599FB633E6 /* MediaPlayer.framework */,
+				AC596E590AAA007834173C41 /* ReplayKit.framework */,
+				F890CE8623DBAB32382CE43D /* SystemConfiguration.framework */,
+				ABE1AD7A9DE341349A018FF2 /* WebKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

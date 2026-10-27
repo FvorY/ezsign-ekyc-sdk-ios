@@ -25,6 +25,13 @@ targets:
       - EzsignEkycExample
     dependencies:
       - package: EzsignEkycSDK
+      - sdk: CoreMotion.framework
+      - sdk: MediaPlayer.framework
+      - sdk: ReplayKit.framework
+      - sdk: WebKit.framework
+      - sdk: SystemConfiguration.framework
+      - sdk: AVFoundation.framework
+      - sdk: CoreMedia.framework
     info:
       path: EzsignEkycExample/Info.plist
     settings:

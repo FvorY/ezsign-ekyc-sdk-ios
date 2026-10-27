@@ -22,11 +22,11 @@ let package = Package(
         ),
         .binaryTarget(
             name: "MegLiveV5Detect",
-            path: "Frameworks/MegLiveV5Detect.framework"
+            path: "Frameworks/MegLiveV5Detect.xcframework"
         ),
         .binaryTarget(
             name: "MGFaceIDBaseKit",
-            path: "Frameworks/MGFaceIDBaseKit.framework"
+            path: "Frameworks/MGFaceIDBaseKit.xcframework"
         )
     ]
 )

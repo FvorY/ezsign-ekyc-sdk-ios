@@ -1,0 +1,73 @@
+//
+//  MegLivePEV5DetectManager.h
+//  MegLiveV5Detect
+//
+//  Created by lianghao on 2024/2/1.
+//
+
+#import <Foundation/Foundation.h>
+#import <MegLiveV5Detect/MegLivePEV5DetectItem.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface MegLivePEV5DetectManager : NSObject
+
+/**
+ 开启FaceID活体检测
+ 
+ @param bizTokenStr   业务串号，如果不需要串联业务，该值可以设置为""
+ @param configItem    设置FaceID活体检测的自定义配置
+ @param configBlock   活体配置。(configItem.model为B时，必选参数，需要通过`config`接口拉取配置信息进行回传；model为A时，该参数无效。由于SDK内部等待结果返回，请在默认线程中进行网络请求，不要返回到主线程。否则会导致线程卡死，直到超时。)
+ @param extraDict     预留参数，当前为nil
+ @param startBlock    活体检测初始化完成block
+ @param detectVC      开启活体检测的VC页面，一般为当前ViewController
+ @param endBlock      活体检测结束时block
+ @param dismissBlock  检测页面收起时block
+ */
++ (void)megFaceIDLiveDetectManagerWithBizToken:(NSString *__nonnull)bizTokenStr
+                                    configInfo:(MegLivePEV5DetectInitConfigItem *__nullable)configItem
+                                 configNetwork:(MegLivePEV5ConfigBlock _Nullable)configBlock
+                                     extraData:(NSDictionary *__nullable)extraDict
+                                 startCallBack:(MegLivePEV5StartDetectBlock)startBlock
+                                      detectVC:(UIViewController *)detectVC
+                                   endCallBack:(MegLivePEV5EndDetectBlock)endBlock
+                               dismissCallBack:(MegLivePEV5DismissBlock)dismissBlock;
+
+/**
+ 获取活体检测过程中的日志信息。加密数据。
+ 
+ @return 加密后的日志信息
+ */
++ (NSData *)queryMGFaceIDLiveDetectLogInfo;
+
+/**
+ 解密活体检测过程中的视频和图片文件。加密数据，需要提供key进行解密。
+ @param filePath   存储加密文件的路径
+ @param encodeStr  用于解密的key。
+ @return 解密后的原始数据
+ */
++ (NSDictionary *)encodeMGFaceIDLiveDetectFileWithFilePath:(NSString *)filePath encodeKey:(NSString *)encodeStr;
+
+/**
+ 重置FaceID请求队列。
+ 如果调用`+megFaceIDLiveDetectManagerWithBizToken`时一直提示`MegLivePEV5DetectErrorTypeRequestFrequently`错误，但并没有频繁调用开启FaceID活体检测方法，请使用该方法重置FaceID请求队列。
+ */
++ (void)resetFaceIDFrequentlyRequest;
+
+/**
+ 获取 SDK 版本号信息
+ 
+ @return SDK 版本号
+ */
++ (NSString *_Nonnull)getSDKVersion;
+
+/**
+ 获取 SDK 构建信息
+ 
+ @return SDK 构建号
+ */
++ (NSString *_Nonnull)getSDKBuild;
+
+@end
+
+NS_ASSUME_NONNULL_END
