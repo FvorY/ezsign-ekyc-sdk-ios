@@ -8,7 +8,7 @@ public struct EkycConfig {
 
     public init(
         authToken: String,
-        baseUrl: String = "https://api.ezsign.id",
+        baseUrl: String = "https://gtm.myesign.id/api",
         title: String = "Verifikasi Identitas",
         primaryColorHex: String = "#15C1E7"
     ) {

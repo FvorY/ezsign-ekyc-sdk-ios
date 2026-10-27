@@ -152,7 +152,7 @@ class ViewController: UIViewController {
         configTitle.textColor = UIColor(red: 0x2D/255.0, green: 0x37/255.0, blue: 0x48/255.0, alpha: 1.0)
 
         baseUrlField.placeholder = "Base URL"
-        baseUrlField.text = "https://api.ezsign.id"
+        baseUrlField.text = "https://gtm.myesign.id/api"
         configureField(baseUrlField)
 
         tokenField.placeholder = "Bearer Auth Token"

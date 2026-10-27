@@ -6,3 +6,5 @@ xcuserdata/
 *.xcuserstate
 Pods/
 .swiftpm/
+build/
+Example/build/

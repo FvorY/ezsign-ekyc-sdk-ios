@@ -6,13 +6,15 @@ final class EkycApiClient {
     private let session: URLSession
 
     init(baseUrl: String, authToken: String) {
-        self.baseUrl = baseUrl.hasSuffix("/") ? String(baseUrl.dropLast()) : baseUrl
+        let clean = baseUrl.trimmingCharacters(in: CharacterSet(charactersIn: "/ "))
+        self.baseUrl = clean.hasSuffix("/api") ? clean : "\(clean)/api"
         self.authToken = authToken.hasPrefix("Bearer ") ? authToken : "Bearer \(authToken)"
         self.session = URLSession.shared
     }
 
     private func makeRequest(path: String, method: String = "POST", jsonBody: [String: Any]? = nil) throws -> URLRequest {
-        guard let url = URL(string: "\(baseUrl)\(path)") else {
+        let cleanPath = path.hasPrefix("/") ? path : "/\(path)"
+        guard let url = URL(string: "\(baseUrl)\(cleanPath)") else {
             throw NSError(domain: "EkycApiClient", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])
         }
         var request = URLRequest(url: url)
@@ -26,24 +28,51 @@ final class EkycApiClient {
         return request
     }
 
+    private func parseResponse<T: Decodable>(_ data: Data, response: URLResponse) throws -> ApiResponse<T> {
+        let httpRes = response as? HTTPURLResponse
+        let statusCode = httpRes?.statusCode ?? 200
+
+        let decoder = JSONDecoder()
+        if let decoded = try? decoder.decode(ApiResponse<T>.self, from: data) {
+            if decoded.code != 200 && decoded.code != 0 {
+                let msg = decoded.message ?? "Terjadi kesalahan pada server"
+                throw NSError(domain: "EkycApiClient", code: decoded.code, userInfo: [NSLocalizedDescriptionKey: msg])
+            }
+            return decoded
+        }
+
+        if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            let msg = (json["message"] as? String) ?? (json["error"] as? String) ?? "Terjadi kesalahan pada server (HTTP \(statusCode))"
+            throw NSError(domain: "EkycApiClient", code: statusCode, userInfo: [NSLocalizedDescriptionKey: msg])
+        }
+
+        if statusCode < 200 || statusCode >= 300 {
+            throw NSError(domain: "EkycApiClient", code: statusCode, userInfo: [NSLocalizedDescriptionKey: "HTTP \(statusCode)"])
+        }
+
+        throw NSError(domain: "EkycApiClient", code: -1, userInfo: [NSLocalizedDescriptionKey: "Gagal memproses respon server"])
+    }
+
     func getEkycStatus() async throws -> ApiResponse<EkycStatusData> {
         let req = try makeRequest(path: "/register/user/ekyc-status")
-        let (data, _) = try await session.data(for: req)
-        return try JSONDecoder().decode(ApiResponse<EkycStatusData>.self, from: data)
+        let (data, res) = try await session.data(for: req)
+        return try parseResponse(data, response: res)
     }
 
     func checkDemografi(nama: String, nik: String, birthDate: String) async throws -> ApiResponse<EmptyData> {
         let body: [String: Any] = ["nama": nama, "nik": nik, "birthDate": birthDate]
 
         let reqCheck = try makeRequest(path: "/register/checkdata", jsonBody: body)
-        let (checkData, _) = try await session.data(for: reqCheck)
+        let (checkData, resCheck) = try await session.data(for: reqCheck)
+        let _: ApiResponse<EmptyData> = try parseResponse(checkData, response: resCheck)
 
         let reqNik = try makeRequest(path: "/register/verifyNik", jsonBody: ["nik": nik])
-        let (nikData, _) = try await session.data(for: reqNik)
+        let (nikData, resNik) = try await session.data(for: reqNik)
+        let _: ApiResponse<EmptyData> = try parseResponse(nikData, response: resNik)
 
         let reqDemo = try makeRequest(path: "/register/checkdemografi", jsonBody: body)
-        let (demoData, _) = try await session.data(for: reqDemo)
-        return try JSONDecoder().decode(ApiResponse<EmptyData>.self, from: demoData)
+        let (demoData, resDemo) = try await session.data(for: reqDemo)
+        return try parseResponse(demoData, response: resDemo)
     }
 
     func validatePhone(phone: String) async throws -> ApiResponse<ValidatePhoneData> {
@@ -53,8 +82,8 @@ final class EkycApiClient {
             "menu": "register_update"
         ]
         let req = try makeRequest(path: "/otp/validatephone", jsonBody: body)
-        let (data, _) = try await session.data(for: req)
-        return try JSONDecoder().decode(ApiResponse<ValidatePhoneData>.self, from: data)
+        let (data, res) = try await session.data(for: req)
+        return try parseResponse(data, response: res)
     }
 
     func verifyOtp(phone: String, otp: String, token: String? = nil) async throws -> ApiResponse<VerifyOtpData> {
@@ -63,14 +92,14 @@ final class EkycApiClient {
             body["token"] = token
         }
         let req = try makeRequest(path: "/register/user/verifyotp", jsonBody: body)
-        let (data, _) = try await session.data(for: req)
-        return try JSONDecoder().decode(ApiResponse<VerifyOtpData>.self, from: data)
+        let (data, res) = try await session.data(for: req)
+        return try parseResponse(data, response: res)
     }
 
     func getBizToken() async throws -> ApiResponse<BizTokenData> {
         let req = try makeRequest(path: "/register/user/get-biz-token")
-        let (data, _) = try await session.data(for: req)
-        return try JSONDecoder().decode(ApiResponse<BizTokenData>.self, from: data)
+        let (data, res) = try await session.data(for: req)
+        return try parseResponse(data, response: res)
     }
 
     func submitLiveness(bizToken: String, livenessId: String) async throws -> ApiResponse<EmptyData> {
@@ -100,8 +129,8 @@ final class EkycApiClient {
         body.append("--\(boundary)--\r\n".data(using: .utf8)!)
         request.httpBody = body
 
-        let (data, _) = try await session.data(for: request)
-        return try JSONDecoder().decode(ApiResponse<EmptyData>.self, from: data)
+        let (data, res) = try await session.data(for: request)
+        return try parseResponse(data, response: res)
     }
 
     func updateMobile(nama: String, nik: String, birthDate: String, phone: String, otp: String, bizToken: String) async throws -> ApiResponse<EmptyData> {
@@ -114,13 +143,13 @@ final class EkycApiClient {
             "bizToken": bizToken
         ]
         let req = try makeRequest(path: "/register/update-mobile", jsonBody: body)
-        let (data, _) = try await session.data(for: req)
-        return try JSONDecoder().decode(ApiResponse<EmptyData>.self, from: data)
+        let (data, res) = try await session.data(for: req)
+        return try parseResponse(data, response: res)
     }
 
     func refreshAuth() async throws -> ApiResponse<AuthRefreshData> {
         let req = try makeRequest(path: "/auth/refresh")
-        let (data, _) = try await session.data(for: req)
-        return try JSONDecoder().decode(ApiResponse<AuthRefreshData>.self, from: data)
+        let (data, res) = try await session.data(for: req)
+        return try parseResponse(data, response: res)
     }
 }
