@@ -282,8 +282,15 @@ xcodebuild -project Example/EzsignEkycExample.xcodeproj \
 
 ## Troubleshooting
 
-**`AUTHENTICATION_FAIL{illegal_param}` atau `bundleid_error` saat memulai liveness**
-Bundle ID aplikasi belum terdaftar di lisensi Megvii ezSign. Alert dari SDK menyebutkan Bundle ID yang ditolak. Daftarkan Bundle ID tersebut atau gunakan Bundle ID yang sudah terdaftar.
+**Alert "Liveness Error" saat memulai liveness**
+SDK menampilkan alert seperti ini:
+
+```
+Lisensi liveness menolak aplikasi io.github.fvory.ekyc.example. Bundle ID ini harus
+didaftarkan pada akun Megvii ezSign. (AUTHENTICATION_FAIL{illegal_param})
+```
+
+Bundle ID yang tertulis di alert belum terdaftar di lisensi Megvii ezSign. Kode di dalam kurung bisa berupa `AUTHENTICATION_FAIL{illegal_param}` atau `bundleid_error`. Daftarkan Bundle ID tersebut atau gunakan Bundle ID yang sudah terdaftar.
 
 **Aplikasi tertutup sendiri saat masuk ke kamera**
 `NSCameraUsageDescription` belum ada di `Info.plist` aplikasi host. Lihat [Konfigurasi Info.plist](#konfigurasi-infoplist).
