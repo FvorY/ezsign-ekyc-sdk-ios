@@ -94,13 +94,19 @@ final class EkycResultViewController: UIViewController {
                     verifyToken: EkycSession.shared.verifyToken
                 )
 
-                _ = try? await client.refreshAuth()
+                // Same as the Flutter app: the refreshed session tells whether RA review starts
+                // or the identity has to be submitted again.
+                let refreshed = try? await client.refreshAuth()
+                let status = refreshed?.data?.regisStatus.flatMap { $0.isEmpty ? nil : $0 } ?? "wait_ra"
+                let needsRekey = ["in_kyc", "reject_ra", "reject_ra_rekey_exp"].contains(status)
 
                 await MainActor.run {
                     self.activityIndicator.stopAnimating()
-                    self.finalResult = .success(regisStatus: "wait_ra", message: "Verifikasi eKYC selesai")
+                    self.finalResult = .success(regisStatus: status, message: "Verifikasi eKYC selesai")
                     self.titleLabel.text = "Verification Complete"
-                    self.descLabel.text = "Your personal identity has been verified and is waiting for RA approval."
+                    self.descLabel.text = needsRekey
+                        ? "Your data was submitted, but the server asks you to verify your identity again."
+                        : "Your personal identity has been verified and is waiting for RA approval."
                     self.finishButton.isEnabled = true
                 }
             } catch {

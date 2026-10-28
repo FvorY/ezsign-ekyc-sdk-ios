@@ -142,7 +142,7 @@ final class ProfileViewController: UIViewController {
         EzsignEkyc.start(from: self, config: config) { result in
             switch result {
             case .success(let regisStatus, let message):
-                // regisStatus bernilai "wait_ra": data menunggu persetujuan RA
+                // "wait_ra" = menunggu RA; "in_kyc"/"reject_ra"/"reject_ra_rekey_exp" = ulangi eKYC
                 print("eKYC selesai (\(regisStatus)): \(message)")
             case .failure(let errorCode, let message):
                 print("eKYC gagal [\(errorCode)]: \(message)")
@@ -199,9 +199,19 @@ Token harus diterbitkan oleh host yang sama dengan `baseUrl`. Token DEV tidak be
 
 | Case | Nilai terkait | Kapan |
 |---|---|---|
-| `.success` | `regisStatus: String`, `message: String` | Semua langkah berhasil dan pengguna menekan tombol selesai. Saat ini `regisStatus` bernilai `wait_ra`. |
+| `.success` | `regisStatus: String`, `message: String` | Semua langkah berhasil dan pengguna menekan tombol selesai. Lihat tabel `regisStatus` di bawah. |
 | `.failure` | `errorCode: String`, `message: String` | Alur berhenti karena error. Lihat [kode error](#penanganan-hasil-dan-kode-error). |
 | `.cancelled` | — | Pengguna menekan tombol close di layar Data Identitas. |
+
+Nilai `regisStatus` diambil dari respons `auth/user/refresh` setelah finalisasi, sama seperti aplikasi ezSign. Jika refresh gagal, nilainya `wait_ra`.
+
+| `regisStatus` | Arti | Tindakan aplikasi host |
+|---|---|---|
+| `wait_ra` | Data menunggu persetujuan Registration Authority (RA). | Arahkan pengguna ke dashboard. |
+| `in_kyc`, `reject_ra` | Server meminta data identitas diverifikasi ulang (rekey). | Jalankan alur eKYC lagi. |
+| `reject_ra_rekey_exp` | Verifikasi ulang diperlukan karena masa berlaku data sudah habis. | Jalankan alur eKYC lagi. |
+| lainnya | Status registrasi lain dari server. | Tangani sesuai aturan bisnis ezSign. |
+
 
 ## Alur verifikasi
 
@@ -218,7 +228,7 @@ Aplikasi host
 1. **Data Identitas**: saat layar dibuka, SDK memeriksa `ekyc-status`. Jika `canEkyc` bernilai `false`, SDK menampilkan peringatan lalu mengakhiri alur dengan `.failure(errorCode: "EKYC_NOT_ALLOWED")`. Pengguna lalu mengisi NIK (16 digit), nama sesuai KTP, dan tanggal lahir.
 2. **Verifikasi OTP**: pengguna memasukkan nomor handphone, menerima OTP lewat SMS, lalu memasukkan kodenya. Token dari respons `verifyotp` disimpan untuk dipakai saat finalisasi.
 3. **Active Liveness Check**: menampilkan instruksi persiapan. SDK meminta `biz_token` dan `liveness_id` ke server ezSign, lalu membuka deteksi Megvii. iOS meminta izin kamera saat pertama kali kamera diakses.
-4. **Hasil**: SDK mengirim hasil liveness, memperbarui biodata akun beserta nomor handphone, lalu me-refresh sesi. Status akhir `wait_ra` berarti data menunggu persetujuan Registration Authority (RA).
+4. **Hasil**: SDK mengirim hasil liveness, memperbarui biodata akun beserta nomor handphone, lalu me-refresh sesi. `regisStatus` dari respons refresh dikembalikan ke aplikasi host.
 
 ## Endpoint server
 
