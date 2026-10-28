@@ -270,7 +270,7 @@ open Example/EzsignEkycExample.xcodeproj
 
 Pilih Team signing Anda, sambungkan iPhone, lalu jalankan skema **EzsignEkycExample**. Proyek dihasilkan dengan XcodeGen dari `Example/project.yml`. Jika file proyek perlu dibuat ulang, jalankan `xcodegen` di folder `Example`.
 
-Bundle ID bawaan Example adalah `io.github.fvory.ekyc.example`. Agar langkah liveness bisa diuji, ganti `PRODUCT_BUNDLE_IDENTIFIER` dengan Bundle ID yang sudah terdaftar di lisensi Megvii.
+Bundle ID bawaan Example adalah `com.sign.livenessdemo`. Untuk menguji dengan Bundle ID lain, ganti `PRODUCT_BUNDLE_IDENTIFIER` dengan Bundle ID yang sudah terdaftar di lisensi Megvii.
 
 Build untuk perangkat tanpa signing (untuk CI):
 
@@ -286,7 +286,7 @@ xcodebuild -project Example/EzsignEkycExample.xcodeproj \
 SDK menampilkan alert seperti ini:
 
 ```
-Lisensi liveness menolak aplikasi io.github.fvory.ekyc.example. Bundle ID ini harus
+Lisensi liveness menolak aplikasi com.example.myapp. Bundle ID ini harus
 didaftarkan pada akun Megvii ezSign. (AUTHENTICATION_FAIL{illegal_param})
 ```
 

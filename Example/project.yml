@@ -38,7 +38,7 @@ targets:
         NSCameraUsageDescription: Kamera diperlukan untuk verifikasi keaktifan wajah (liveness check).
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: io.github.fvory.ekyc.example
+        PRODUCT_BUNDLE_IDENTIFIER: com.sign.livenessdemo
         TARGETED_DEVICE_FAMILY: "1"
 
 schemes:
