@@ -18,5 +18,6 @@ Pod::Spec.new do |s|
   s.source_files     = 'Sources/EzsignEkycSDK/**/*.swift'
   s.resources        = ['Resources/**/*']
   s.vendored_frameworks = 'Frameworks/MegLiveV5Detect.framework', 'Frameworks/MGFaceIDBaseKit.framework'
-  s.frameworks       = 'UIKit', 'AVFoundation', 'CoreMedia', 'CoreMotion'
+  s.frameworks       = 'UIKit', 'AVFoundation', 'CoreMedia', 'CoreMotion', 'SystemConfiguration', 'WebKit', 'MediaPlayer', 'ReplayKit'
+  s.libraries        = 'c++'
 end

@@ -24,6 +24,17 @@ let package = Package(
                 .process("Resources/InterVariable.ttf"),
                 .process("Resources/EkycAssets.xcassets"),
                 .copy("Resources/MegLiveV5Detect.bundle")
+            ],
+            // System libraries required by MegLiveV5Detect (Megvii FaceID SDK integration guide 2.2.4).
+            linkerSettings: [
+                .linkedFramework("AVFoundation"),
+                .linkedFramework("CoreMedia"),
+                .linkedFramework("CoreMotion"),
+                .linkedFramework("SystemConfiguration"),
+                .linkedFramework("WebKit"),
+                .linkedFramework("MediaPlayer"),
+                .linkedFramework("ReplayKit"),
+                .linkedLibrary("c++")
             ]
         ),
         .binaryTarget(
