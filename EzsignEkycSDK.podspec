@@ -1,11 +1,11 @@
 Pod::Spec.new do |s|
   s.name             = 'EzsignEkycSDK'
   s.version          = '1.0.0'
-  s.summary          = 'Native iOS SDK for ezSign eKYC verification with Megvii FaceID Active Liveness.'
+  s.summary          = 'Native iOS SDK for ezSign eKYC verification with active liveness detection.'
   s.description      = <<-DESC
     Provides an all-in-one eKYC verification flow for iOS including demographic
     data validation (NIK, full name, birth date), phone OTP verification, and
-    native active liveness detection powered by Megvii FaceID LV5.
+    native active liveness detection.
   DESC
   s.homepage         = 'https://github.com/FvorY/ezsign-ekyc-sdk-ios'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
