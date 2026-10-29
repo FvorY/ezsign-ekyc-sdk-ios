@@ -22,7 +22,9 @@ final class EkycApiClient {
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
         self.authToken = "Bearer \(cleanToken)"
-        self.session = URLSession.shared
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = 30
+        self.session = URLSession(configuration: configuration)
     }
 
     private func makeRequest(path: String, method: String = "POST", jsonBody: [String: Any]? = nil) throws -> URLRequest {
@@ -133,6 +135,8 @@ final class EkycApiClient {
         request.httpMethod = "POST"
         request.setValue(authToken, forHTTPHeaderField: "Authorization")
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        request.setValue("ezSign-iOS", forHTTPHeaderField: "User-Agent")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
 
         var body = Data()
         let fields: [String: String] = [

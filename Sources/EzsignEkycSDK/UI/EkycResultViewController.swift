@@ -14,6 +14,12 @@ final class EkycResultViewController: UIViewController {
         finalizeEkyc()
     }
 
+    // The result screen cannot be left while the flow is being finalized.
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+    }
+
     private func setupUI() {
         view.backgroundColor = .white
         overrideUserInterfaceStyle = .light
@@ -78,6 +84,8 @@ final class EkycResultViewController: UIViewController {
         Task {
             var failureCode = "LIVENESS_SUBMIT_FAILED"
             do {
+                // Same as the Flutter app: give the liveness upload a moment before verifying it.
+                try await Task.sleep(nanoseconds: 2_000_000_000)
                 _ = try await client.submitLiveness(
                     bizToken: EkycSession.shared.bizToken,
                     livenessId: EkycSession.shared.livenessId

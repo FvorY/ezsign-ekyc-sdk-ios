@@ -197,7 +197,7 @@ final class OtpViewController: UIViewController {
 
         Task {
             do {
-                let res = try await client.verifyOtp(phone: phone, otp: otp)
+                let res = try await client.verifyOtp(phone: phone, otp: otp, token: EkycSession.shared.verifyToken)
                 await MainActor.run {
                     self.activityIndicator.stopAnimating()
                     self.verifyButton.isEnabled = true

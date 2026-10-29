@@ -31,7 +31,11 @@ struct ApiResponse<T: Decodable>: Decodable {
     let data: T?
 }
 
-struct EmptyData: Decodable {}
+/// Accepts any `data` value (object, array, string, number or null), like the Android SDK,
+/// for endpoints whose payload the SDK does not read.
+struct EmptyData: Decodable {
+    init(from decoder: Decoder) throws {}
+}
 
 struct EkycStatusData: Decodable {
     let canEkyc: Bool
@@ -40,6 +44,20 @@ struct EkycStatusData: Decodable {
 
 struct ValidatePhoneData: Decodable {
     let cooldown: Double?
+
+    private enum CodingKeys: String, CodingKey { case cooldown }
+
+    // The server may send the cooldown as a number or a numeric string.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        if let value = try? container.decodeIfPresent(Double.self, forKey: .cooldown) {
+            cooldown = value
+        } else if let text = try? container.decodeIfPresent(String.self, forKey: .cooldown) {
+            cooldown = Double(text)
+        } else {
+            cooldown = nil
+        }
+    }
 }
 
 struct VerifyOtpData: Decodable {

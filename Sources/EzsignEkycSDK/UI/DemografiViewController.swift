@@ -20,6 +20,8 @@ final class DemografiViewController: UIViewController {
 
     private let dateFormatter: DateFormatter = {
         let df = DateFormatter()
+        df.calendar = Calendar(identifier: .gregorian)
+        df.locale = Locale(identifier: "en_US_POSIX")
         df.dateFormat = "dd-MM-yyyy"
         return df
     }()
@@ -145,7 +147,9 @@ final class DemografiViewController: UIViewController {
 
     private func checkStatus() {
         guard let client = EkycSession.shared.client else { return }
+        continueButton.isEnabled = false
         Task {
+            defer { continueButton.isEnabled = true }
             do {
                 let res = try await client.getEkycStatus()
                 if res.data?.canEkyc == false {
