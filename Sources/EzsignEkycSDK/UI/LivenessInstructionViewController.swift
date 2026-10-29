@@ -261,7 +261,7 @@ final class LivenessInstructionViewController: UIViewController {
         let text: String
         if upper.contains("AUTHENTICATION_FAIL") || upper.contains("BUNDLEID") {
             let bundleId = Bundle.main.bundleIdentifier ?? "-"
-            text = "The liveness license rejected \(bundleId). Register this bundle ID with the ezSign Megvii account. (\(message))"
+            text = "The liveness license rejected \(bundleId). Register this bundle ID with the ezSign liveness license. (\(message))"
         } else if code == Self.megviiUserCancel {
             return "Liveness has been cancelled"
         } else if code == Self.megviiNoCameraPermission {

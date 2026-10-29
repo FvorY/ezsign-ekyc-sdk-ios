@@ -1,6 +1,6 @@
 # ezsign-ekyc-sdk-ios
 
-SDK iOS native (Swift, UIKit) untuk alur verifikasi identitas elektronik (eKYC) ezSign. Satu pemanggilan menjalankan seluruh alur: validasi data kependudukan, verifikasi OTP nomor handphone, active liveness wajah dengan Megvii FaceID, sampai finalisasi data ke server ezSign.
+SDK iOS native (Swift, UIKit) untuk alur verifikasi identitas elektronik (eKYC) ezSign. Satu pemanggilan menjalankan seluruh alur: validasi data kependudukan, verifikasi OTP nomor handphone, active liveness wajah, sampai finalisasi data ke server ezSign.
 
 SDK Android dengan API, alur, teks, dan kode error yang sama ada di [ezsign-ekyc-sdk-android](https://github.com/FvorY/ezsign-ekyc-sdk-android).
 
@@ -9,7 +9,7 @@ SDK Android dengan API, alur, teks, dan kode error yang sama ada di [ezsign-ekyc
 - [Demo](#demo)
 - [Fitur](#fitur)
 - [Persyaratan](#persyaratan)
-- [Komponen Megvii FaceID](#komponen-megvii-faceid)
+- [Komponen liveness engine](#komponen-liveness-engine)
 - [Prasyarat lisensi liveness (wajib)](#prasyarat-lisensi-liveness-wajib)
 - [Instalasi](#instalasi)
 - [Konfigurasi Info.plist](#konfigurasi-infoplist)
@@ -19,7 +19,7 @@ SDK Android dengan API, alur, teks, dan kode error yang sama ada di [ezsign-ekyc
 - [Arsitektur liveness](#arsitektur-liveness)
 - [Endpoint server](#endpoint-server)
 - [Penanganan hasil dan kode error](#penanganan-hasil-dan-kode-error)
-- [Kode error Megvii](#kode-error-megvii)
+- [Kode error liveness engine](#kode-error-liveness-engine)
 - [Data dan privasi](#data-dan-privasi)
 - [Keselarasan Android dan iOS](#keselarasan-android-dan-ios)
 - [Aplikasi Example](#aplikasi-example)
@@ -40,14 +40,14 @@ APK dan IPA demo tersedia di halaman [Releases](https://github.com/FvorY/ezsign-
 5. Percayai profil pengembang di **Settings → General → VPN & Device Management**.
 6. Buka aplikasi, isi Base URL dan token sesi login ezSign, lalu mulai verifikasi.
 
-> IPA demo memakai Bundle ID `com.sign.livenessdemo`. Liveness hanya berjalan bila Bundle ID tersebut terdaftar di lisensi Megvii untuk iOS. Sideloadly dapat mengganti Bundle ID saat signing; Bundle ID hasil akhirnya yang harus terdaftar. Lihat [Prasyarat lisensi liveness](#prasyarat-lisensi-liveness-wajib).
+> IPA demo memakai Bundle ID `com.sign.livenessdemo`. Liveness hanya berjalan bila Bundle ID tersebut terdaftar di lisensi liveness ezSign untuk iOS. Sideloadly dapat mengganti Bundle ID saat signing; Bundle ID hasil akhirnya yang harus terdaftar. Lihat [Prasyarat lisensi liveness](#prasyarat-lisensi-liveness-wajib).
 
 ## Fitur
 
 - **Pemeriksaan status eKYC**: memastikan akun boleh melakukan eKYC (`canEkyc`) sebelum alur dimulai.
 - **Validasi demografi**: NIK 16 digit, nama lengkap, dan tanggal lahir divalidasi ke server.
 - **Verifikasi OTP**: nomor handphone dinormalkan ke format `+62…`, OTP dikirim lewat SMS dengan cooldown kirim ulang, lalu diverifikasi.
-- **Active liveness**: layar instruksi persiapan, lalu deteksi wajah native Megvii FaceID.
+- **Active liveness**: layar instruksi persiapan, lalu deteksi wajah native.
 - **Finalisasi otomatis**: mengirim hasil liveness, memperbarui biodata akun, me-refresh sesi, dan mengembalikan `regisStatus` dari server.
 - **UI siap pakai**: tampilan mengikuti aplikasi ezSign (font Inter, warna, ilustrasi) dan selalu memakai mode terang.
 - **Hasil bertipe**: `EkycResult.success`, `.failure`, atau `.cancelled`.
@@ -59,34 +59,34 @@ APK dan IPA demo tersedia di halaman [Releases](https://github.com/FvorY/ezsign-
 | iOS minimum | 14.0 |
 | Xcode | 15.0+ |
 | Swift | 5.9+ |
-| Perangkat | iPhone fisik (arm64). Framework Megvii tidak menyertakan slice Simulator. |
+| Perangkat | iPhone fisik (arm64). Liveness engine tidak menyertakan slice Simulator. |
 | Orientasi | Portrait |
-| Jaringan | Akses ke `baseUrl` ezSign dan ke `https://api-idn.megvii.com` |
+| Jaringan | Akses HTTPS ke `baseUrl` ezSign dan ke layanan liveness (region Indonesia) |
 | Akun | Token sesi akun ezSign yang valid di environment yang dipakai |
 
-## Komponen Megvii FaceID
+## Komponen liveness engine
 
 | Komponen | Nilai |
 |---|---|
-| Framework | `MegLiveV5Detect` dan `MGFaceIDBaseKit` (library statis, build `b2aa1b5` 11 Desember 2024). `.xcframework` untuk SPM, `.framework` untuk CocoaPods. |
-| Resource | `MegLiveV5Detect.bundle` (model, gambar, audio, teks), dimuat lewat `bundleFilePath` dari resource bundle SDK |
+| Framework | Dua framework liveness statis di folder `Frameworks/` (build 11 Desember 2024). `.xcframework` untuk SPM, `.framework` untuk CocoaPods. |
+| Resource | Bundle resource liveness di `Resources/` (model, gambar, audio, teks), dimuat otomatis dari resource bundle SDK |
 | Bahasa layar deteksi | Inggris. SDK memakai `languageType` bawaan (`Ch`, folder `ch`), dan folder tersebut berisi teks bahasa Inggris versi overseas. |
-| Host Megvii | `https://api-idn.megvii.com` (`hostURL`, region Indonesia) |
-| Mode integrasi | `MegLiveV5DetectModel_A`: lisensi dan konfigurasi liveness diambil oleh SDK Megvii |
+| Region layanan | Indonesia (sudah dikonfigurasi di SDK) |
+| Mode integrasi | Normal: lisensi dan konfigurasi liveness diambil otomatis oleh engine |
 | Framework sistem | AVFoundation, CoreMedia, CoreMotion, SystemConfiguration, WebKit, MediaPlayer, ReplayKit, dan `libc++` ditautkan otomatis oleh `Package.swift` dan podspec |
 
-Dokumen Megvii mencantumkan dukungan iOS 9–18. SDK ini memakai batas yang lebih ketat, yaitu iOS 14.
+Liveness engine mendukung iOS 9–18. SDK ini memakai batas yang lebih ketat, yaitu iOS 14.
 
-Megvii adalah library Objective-C++ statis. Dokumen Megvii meminta aplikasi memiliki file `.mm` atau mengatur **Compile Sources As** ke Objective-C++. Pada SDK ini kebutuhan itu sudah dipenuhi dengan menautkan `libc++`, jadi aplikasi host tidak perlu mengubah pengaturan apa pun.
+Liveness engine adalah library Objective-C++ statis yang biasanya mengharuskan aplikasi memiliki file `.mm` atau mengatur **Compile Sources As** ke Objective-C++. Pada SDK ini kebutuhan itu sudah dipenuhi dengan menautkan `libc++`, jadi aplikasi host tidak perlu mengubah pengaturan apa pun.
 
 ## Prasyarat lisensi liveness (wajib)
 
-Lisensi Megvii FaceID terikat pada **Bundle ID aplikasi** yang menjalankan SDK. Saat liveness dimulai, SDK Megvii memverifikasi Bundle ID ke server Megvii. Kalau Bundle ID belum terdaftar di akun Megvii ezSign, liveness gagal sebelum kamera terbuka dengan kode `1003` (`AUTHENTICATION_FAIL{…}`) atau `1009` (`INVALID_BUNDLE_ID`).
+Lisensi liveness terikat pada **Bundle ID aplikasi** yang menjalankan SDK. Saat liveness dimulai, engine memverifikasi Bundle ID ke server lisensi. Kalau Bundle ID belum terdaftar di lisensi liveness ezSign, liveness gagal sebelum kamera terbuka dengan kode `1003` (`AUTHENTICATION_FAIL{…}`) atau `1009` (`INVALID_BUNDLE_ID`).
 
 Sebelum integrasi:
 
 1. Tentukan Bundle ID final aplikasi Anda, termasuk varian untuk debug, staging, dan release.
-2. Minta tim ezSign mendaftarkan setiap Bundle ID tersebut ke lisensi Megvii FaceID.
+2. Minta tim ezSign mendaftarkan setiap Bundle ID tersebut ke lisensi liveness.
 3. Untuk Android, daftarkan juga `applicationId` aplikasinya.
 
 Langkah demografi dan OTP tidak bergantung pada lisensi ini. Karena itu, masalah lisensi baru terlihat di layar **Active Liveness Check**.
@@ -117,7 +117,7 @@ targets: [
 ]
 ```
 
-Package ini sudah membawa framework Megvii, resource-nya (gambar, font Inter, `MegLiveV5Detect.bundle`), dan pengaturan link framework sistem.
+Package ini sudah membawa liveness engine, resource-nya (gambar, font Inter, bundle resource liveness), dan pengaturan link framework sistem.
 
 ### CocoaPods
 
@@ -136,7 +136,7 @@ Ganti `<tag>` dengan tag rilis yang tersedia, atau gunakan `:branch => 'main'`. 
 pod install
 ```
 
-Framework Megvii berupa library statis, sehingga tidak perlu di-embed secara manual.
+Liveness engine berupa library statis, sehingga tidak perlu di-embed secara manual.
 
 ## Konfigurasi Info.plist
 
@@ -243,14 +243,14 @@ Aplikasi host
   └─ EzsignEkyc.start(from:config:completion:)
        1. Data Identitas  ── ekyc-status → checkdata → verifyNik → checkdemografi
        2. Verifikasi OTP  ── validatephone (kirim OTP) → verifyotp
-       3. Active Liveness ── get-biz-token → Megvii FaceID (kamera)
+       3. Active Liveness ── get-biz-token → liveness engine (kamera)
        4. Hasil           ── liveness-face-id → update-mobile → auth/user/refresh
   ◀─ completion(EkycResult)
 ```
 
 1. **Data Identitas** (judul `config.title`): saat layar dibuka, SDK memeriksa `ekyc-status`. Jika `canEkyc` bernilai `false`, SDK menampilkan peringatan lalu mengakhiri alur dengan `.failure(errorCode: "EKYC_NOT_ALLOWED")`. Pengguna mengisi NIK (16 digit), nama sesuai KTP, dan tanggal lahir, lalu mengonfirmasi data di dialog **Review Your Information**. Alurnya sama dengan aplikasi ezSign: tidak ada foto KTP maupun selfie terpisah.
 2. **Verification Phone**: nomor handphone dinormalkan ke `+62…` (minimal 9 digit setelah `+62`). Setelah OTP terkirim lewat SMS, pengguna memasukkan 6 digit kode. Token dari respons `verifyotp` disimpan untuk dipakai saat finalisasi.
-3. **Active Liveness Check**: menampilkan instruksi persiapan. SDK meminta izin kamera bila belum diberikan, meminta `biz_token` dan `liveness_id` ke server ezSign, lalu membuka layar deteksi Megvii.
+3. **Active Liveness Check**: menampilkan instruksi persiapan. SDK meminta izin kamera bila belum diberikan, meminta `biz_token` dan `liveness_id` ke server ezSign, lalu membuka layar deteksi liveness.
 4. **Verification**: SDK mengirim hasil liveness, memperbarui biodata akun beserta nomor handphone, lalu me-refresh sesi. `regisStatus` dari respons refresh dikembalikan ke aplikasi host.
 
 Navigasi:
@@ -261,17 +261,17 @@ Navigasi:
 
 ## Arsitektur liveness
 
-Dokumen Megvii membagi autentikasi liveness menjadi lima langkah. Kredensial Megvii (`api_key`, `api_secret`) hanya ada di server ezSign, tidak pernah di aplikasi.
+Autentikasi liveness terdiri dari lima langkah. Kredensial layanan liveness (`api_key`, `api_secret`) hanya ada di server ezSign, tidak pernah di aplikasi.
 
-| Langkah Megvii | Dikerjakan oleh | Implementasi |
+| Langkah | Dikerjakan oleh | Implementasi |
 |---|---|---|
 | 1. Membuat `sign` dari `api_key`/`api_secret` | Server ezSign | — |
 | 2. `get_biz_token` | Server ezSign | SDK memanggil `/register/user/get-biz-token`, respons berisi `biz_token` dan `liveness_id`. |
-| 3. Preprocessing (lisensi dan konfigurasi) | SDK Megvii di perangkat | `MegLiveV5DetectManager.megFaceIDLive(withBizToken:…)`, hasil di `startCallBack`. |
-| 4. Deteksi wajah dan callback hasil | SDK Megvii di perangkat | Hasil di `endCallBack`; kode selain `1000` ditangani sesuai [Kode error Megvii](#kode-error-megvii). |
+| 3. Preprocessing (lisensi dan konfigurasi) | Liveness engine di perangkat | Hasil di callback `startCallBack`. |
+| 4. Deteksi wajah dan callback hasil | Liveness engine di perangkat | Hasil di callback `endCallBack`; kode selain `1000` ditangani sesuai [Kode error liveness engine](#kode-error-liveness-engine). |
 | 5. Verify (perbandingan dan anti-spoofing) | Server ezSign | SDK memanggil `/register/user/liveness-face-id` dengan `biz_token`, `verify_id = liveness_id`, `data_type = 0` (data SDK 5.x lewat `biz_token`), dan `encryption_type = 0`. |
 
-Respons Verify Megvii (`result_code` seperti `1000 SUCCESS`, `2000 PASS_LIVING_NOT_THE_SAME`, `4100 FAIL_LIVING_FACE_ATTACK`/`VIDEO_LACK_FRAMES`, serta info risiko perangkat dan wajah) dievaluasi oleh server ezSign dan tidak diteruskan ke aplikasi. Aplikasi hanya menerima `code` dan `message` ezSign. Jika Verify tidak lolos, alur berakhir dengan `.failure(errorCode: "LIVENESS_SUBMIT_FAILED")` berisi pesan dari server.
+Respons Verify (`result_code` seperti `1000 SUCCESS`, `2000 PASS_LIVING_NOT_THE_SAME`, `4100 FAIL_LIVING_FACE_ATTACK`/`VIDEO_LACK_FRAMES`, serta info risiko perangkat dan wajah) dievaluasi oleh server ezSign dan tidak diteruskan ke aplikasi. Aplikasi hanya menerima `code` dan `message` ezSign. Jika Verify tidak lolos, alur berakhir dengan `.failure(errorCode: "LIVENESS_SUBMIT_FAILED")` berisi pesan dari server.
 
 ## Endpoint server
 
@@ -301,20 +301,20 @@ Respons dianggap berhasil hanya jika HTTP 2xx **dan** field `code` bernilai `200
 | `UPDATE_PROFILE_FAILED` | `update-mobile` ditolak. | Tampilkan `message`, lalu ulangi atau hubungi dukungan. |
 | `INCOMPLETE` | Layar hasil ditutup sebelum finalisasi selesai. | Perlakukan sebagai gagal dan izinkan pengguna mengulang. |
 
-Error di langkah demografi, OTP, pembuatan biz token, dan deteksi Megvii ditampilkan sebagai alert di layar masing-masing. Pengguna bisa mencoba lagi tanpa keluar dari alur, sehingga error ini tidak dikembalikan sebagai `.failure`.
+Error di langkah demografi, OTP, pembuatan biz token, dan deteksi liveness ditampilkan sebagai alert di layar masing-masing. Pengguna bisa mencoba lagi tanpa keluar dari alur, sehingga error ini tidak dikembalikan sebagai `.failure`.
 
-## Kode error Megvii
+## Kode error liveness engine
 
-Kode berikut berasal dari `MegLiveV5DetectErrorType` di `startCallBack` dan `endCallBack` (dokumen Megvii FaceID SDK, bagian 3.2.4.5). SDK menampilkannya dalam alert **Liveness Check Failed** dengan pengelompokan pesan yang sama seperti aplikasi ezSign, diikuti kodenya, misalnya `(1016)`.
+Kode berikut berasal dari callback `startCallBack` dan `endCallBack`. SDK menampilkannya dalam alert **Liveness Check Failed** dengan pengelompokan pesan yang sama seperti aplikasi ezSign, diikuti kodenya, misalnya `(1016)`.
 
-| Kode | Enum Megvii | Arti | Pesan yang ditampilkan SDK |
+| Kode | Nama error engine | Arti | Pesan yang ditampilkan SDK |
 |---|---|---|---|
 | 1000 | `…ErrorTypeOK` | Liveness selesai | — (lanjut ke finalisasi) |
 | 1001 | `…BizTokenDenied` | `biz_token` tidak valid | Coba lagi* |
 | 1002 | `…IllegalParameter` | Parameter tidak valid | Coba lagi* |
 | 1003 | `…AuthenticationFail` | Autentikasi lisensi gagal | Bundle ID yang ditolak dan cara mendaftarkannya |
 | 1004 | `…MobileNotSupport` | Perangkat tidak didukung | Perangkat tidak didukung** |
-| 1005 | `…NullPointException` | Exception internal Megvii | Coba lagi* |
+| 1005 | `…NullPointException` | Exception internal engine | Coba lagi* |
 | 1006 | `…RequestFrequently` | Pemanggilan bersamaan di perangkat yang sama | Coba lagi* |
 | 1007 | `…NetworkTimeout` | Request jaringan timeout | Coba lagi* |
 | 1008 | `…InternalError` | Error konfigurasi jaringan | Coba lagi* |
@@ -328,8 +328,8 @@ Kode berikut berasal dari `MegLiveV5DetectErrorType` di `startCallBack` dan `end
 | 1017 | `…GotoBackground` | Aplikasi masuk background | Coba lagi* |
 | 1018 | `…LivenessTimeout` | Pengguna tidak bergerak terlalu lama | Coba lagi* |
 | 1019 | `…DataUploadFail` | Upload data gagal | Coba lagi* |
-| 1020–1027 | NFC, perekaman layar, `…VideoRecordFail` | Fitur yang tidak dipakai SDK | Pesan Megvii apa adanya |
-| lainnya | — | Kode baru dari Megvii | Pesan Megvii apa adanya |
+| 1020–1027 | NFC, perekaman layar, `…VideoRecordFail` | Fitur yang tidak dipakai SDK | Pesan engine apa adanya |
+| lainnya | — | Kode baru dari engine | Pesan engine apa adanya |
 
 \* `We couldn't complete the liveness check. Please try again in a few moments.`
 \** `Your device is currently not supported. Please try using a different device.`
@@ -339,21 +339,21 @@ Setelah alert ditutup, pengguna tetap di layar **Active Liveness Check** dan bis
 ## Data dan privasi
 
 - NIK, nama, tanggal lahir, nomor handphone, dan OTP hanya dikirim ke `baseUrl` ezSign lewat HTTPS. Data sesi di memori dihapus saat alur berakhir.
-- Video dan foto wajah diambil dan dikirim oleh SDK Megvii ke host Megvii. SDK ezSign tidak menyimpan file liveness lokal (`extraOutDict` dari Megvii diabaikan).
+- Video dan foto wajah diambil dan dikirim oleh liveness engine langsung ke layanan liveness. SDK ezSign tidak menyimpan file liveness lokal (data tambahan dari engine diabaikan).
 - SDK tidak menulis log berisi token, data identitas, maupun body HTTP.
 
 ## Keselarasan Android dan iOS
 
-Kedua SDK memakai alur, endpoint, teks layar, aturan validasi, kode `errorCode`, nilai `regisStatus`, dan pemetaan kode error Megvii yang sama. Perbedaannya hanya pada hal yang memang khas platform:
+Kedua SDK memakai alur, endpoint, teks layar, aturan validasi, kode `errorCode`, nilai `regisStatus`, dan pemetaan kode error liveness engine yang sama. Perbedaannya hanya pada hal yang memang khas platform:
 
 | Aspek | Android | iOS |
 |---|---|---|
 | Entry point | `EzsignEkyc.Contract()` / `EzsignEkyc.start()` | `EzsignEkyc.start(from:config:completion:)` |
 | Hasil | `EkycResult.Success` / `Failed` / `Cancelled` | `.success` / `.failure` / `.cancelled` |
-| Library Megvii | `faceidv5.aar` 5.7.21A | `MegLiveV5Detect` + `MGFaceIDBaseKit` (build Desember 2024) |
+| Liveness engine | `faceidv5.aar` 5.7.21A | Framework liveness statis (build Desember 2024) |
 | Identitas lisensi | `applicationId` | Bundle ID |
 | Izin kamera | Runtime permission | `NSCameraUsageDescription` + permintaan izin sistem |
-| Deteksi posisi tegak perangkat | Bawaan Megvii | Dinonaktifkan (`phoneVertical = Disable`), sama seperti aplikasi ezSign |
+| Deteksi posisi tegak perangkat | Bawaan engine | Dinonaktifkan (`phoneVertical = Disable`), sama seperti aplikasi ezSign |
 | Kode `INVALID_CONFIG` | Ada (Activity tanpa config) | Tidak ada (config wajib di API) |
 | Kode `INCOMPLETE` | Tidak ada | Ada (layar hasil ditutup sebelum finalisasi selesai) |
 
@@ -367,7 +367,7 @@ open Example/EzsignEkycExample.xcodeproj
 
 Pilih Team signing Anda, sambungkan iPhone, lalu jalankan skema **EzsignEkycExample**. Proyek dihasilkan dengan XcodeGen dari `Example/project.yml`. Jika file proyek perlu dibuat ulang, jalankan `xcodegen` di folder `Example`.
 
-Bundle ID bawaan Example adalah `com.sign.livenessdemo`. Untuk menguji dengan Bundle ID lain, ganti `PRODUCT_BUNDLE_IDENTIFIER` dengan Bundle ID yang sudah terdaftar di lisensi Megvii.
+Bundle ID bawaan Example adalah `com.sign.livenessdemo`. Untuk menguji dengan Bundle ID lain, ganti `PRODUCT_BUNDLE_IDENTIFIER` dengan Bundle ID yang sudah terdaftar di lisensi liveness ezSign.
 
 Build untuk perangkat tanpa signing (untuk CI):
 
@@ -384,28 +384,28 @@ SDK menampilkan alert seperti ini:
 
 ```
 The liveness license rejected com.example.myapp. Register this bundle ID with
-the ezSign Megvii account. (AUTHENTICATION_FAIL{illegal_param}) (1003)
+the ezSign liveness license. (AUTHENTICATION_FAIL{illegal_param}) (1003)
 ```
 
-Bundle ID yang tertulis di alert belum terdaftar di lisensi Megvii ezSign. Kode di dalam kurung bisa berupa `AUTHENTICATION_FAIL{illegal_param}` atau `bundleid_error`. Daftarkan Bundle ID tersebut atau gunakan Bundle ID yang sudah terdaftar.
+Bundle ID yang tertulis di alert belum terdaftar di lisensi liveness ezSign. Kode di dalam kurung bisa berupa `AUTHENTICATION_FAIL{illegal_param}` atau `bundleid_error`. Daftarkan Bundle ID tersebut atau gunakan Bundle ID yang sudah terdaftar.
 
 **Aplikasi tertutup sendiri saat masuk ke kamera**
 `NSCameraUsageDescription` belum ada di `Info.plist` aplikasi host. Lihat [Konfigurasi Info.plist](#konfigurasi-infoplist).
 
 **Build gagal untuk Simulator (`building for iOS Simulator, but linking in object file built for iOS`)**
-Framework Megvii hanya berisi arsitektur perangkat (arm64, armv7). Build dan jalankan di iPhone fisik.
+Liveness engine hanya berisi arsitektur perangkat (arm64, armv7). Build dan jalankan di iPhone fisik.
 
-**`Undefined symbols` dari Megvii saat link**
-Biasanya muncul bila framework Megvii ditambahkan manual tanpa framework sistem yang dibutuhkan. Pasang SDK lewat SPM atau CocoaPods agar AVFoundation, CoreMedia, CoreMotion, SystemConfiguration, WebKit, MediaPlayer, ReplayKit, dan `libc++` ditautkan otomatis.
+**`Undefined symbols` dari liveness engine saat link**
+Biasanya muncul bila framework liveness ditambahkan manual tanpa framework sistem yang dibutuhkan. Pasang SDK lewat SPM atau CocoaPods agar AVFoundation, CoreMedia, CoreMotion, SystemConfiguration, WebKit, MediaPlayer, ReplayKit, dan `libc++` ditautkan otomatis.
 
 **Error `NO_ADD_RESOURCE` saat liveness dimulai**
-`MegLiveV5Detect.bundle` tidak ditemukan. Jangan menghapus resource bundle `EzsignEkycSDK_EzsignEkycSDK.bundle` dari aplikasi, karena SDK memuat resource Megvii dari bundle tersebut.
+Bundle resource liveness tidak ditemukan. Jangan menghapus resource bundle `EzsignEkycSDK_EzsignEkycSDK.bundle` dari aplikasi, karena SDK memuat resource liveness dari bundle tersebut.
 
 **`Unauthorized` / `JWT validation failed`**
 Token sudah kedaluwarsa atau diterbitkan oleh environment lain. Login ulang di host yang sama dengan `baseUrl`, lalu pakai `data.token` dari respons login. Jangan memakai token dari respons OTP sebagai `authToken`.
 
 **Liveness gagal setelah instal lewat Sideloadly/AltStore**
-Alat tersebut bisa mengganti Bundle ID saat signing. Pastikan Bundle ID hasil akhirnya terdaftar di lisensi Megvii.
+Alat tersebut bisa mengganti Bundle ID saat signing. Pastikan Bundle ID hasil akhirnya terdaftar di lisensi liveness ezSign.
 
 ## Struktur proyek
 
@@ -416,8 +416,8 @@ Sources/EzsignEkycSDK/
   Models/PhoneNumber.swift    Normalisasi nomor handphone +62
   Network/EkycApiClient.swift Klien HTTP (URLSession, async/await)
   UI/                         View controller per langkah, sesi, gaya
-Resources/                    Gambar, font Inter, asset catalog, MegLiveV5Detect.bundle
-Frameworks/                   MegLiveV5Detect & MGFaceIDBaseKit (.xcframework untuk SPM, .framework untuk CocoaPods)
+Resources/                    Gambar, font Inter, asset catalog, bundle resource liveness
+Frameworks/                   Liveness engine (.xcframework untuk SPM, .framework untuk CocoaPods)
 Example/                      Aplikasi simulasi
 Package.swift                 Manifest Swift Package Manager
 EzsignEkycSDK.podspec         Spesifikasi CocoaPods
@@ -425,4 +425,4 @@ EzsignEkycSDK.podspec         Spesifikasi CocoaPods
 
 ## Lisensi
 
-Kode SDK didistribusikan di bawah lisensi MIT; lihat [`LICENSE`](LICENSE). Framework dan resource Megvii FaceID (`MegLiveV5Detect`, `MGFaceIDBaseKit`, `MegLiveV5Detect.bundle`) tunduk pada perjanjian lisensi Megvii yang terpisah.
+Kode SDK didistribusikan di bawah lisensi MIT; lihat [`LICENSE`](LICENSE). Liveness engine beserta resource-nya (isi folder `Frameworks/` dan bundle resource liveness) adalah komponen pihak ketiga yang tunduk pada perjanjian lisensi tersendiri.
