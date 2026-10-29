@@ -199,7 +199,7 @@ final class LivenessInstructionViewController: UIViewController {
                     EkycSession.shared.bizToken = data.biz_token
                     EkycSession.shared.livenessId = data.liveness_id
 
-                    self.startLivenessEngine(bizToken: data.biz_token)
+                    self.startMegviiLiveness(bizToken: data.biz_token)
                 }
             } catch {
                 await MainActor.run {
@@ -211,7 +211,7 @@ final class LivenessInstructionViewController: UIViewController {
         }
     }
 
-    private func startLivenessEngine(bizToken: String) {
+    private func startMegviiLiveness(bizToken: String) {
         let config = MegLiveV5DetectInitConfigItem()
         config.phoneVertical = MegLiveV5DetectPhoneVerticalTypeDisable
         config.hostURL = "https://api-idn.megvii.com"
@@ -224,7 +224,7 @@ final class LivenessInstructionViewController: UIViewController {
             startCallBack: { error, extra in
                 if let err = error, err.errorCode.rawValue != 1000 {
                     DispatchQueue.main.async {
-                        self.showLivenessError(code: Int(err.errorCode.rawValue), message: err.errorMessage)
+                        self.showMegviiError(code: Int(err.errorCode.rawValue), message: err.errorMessage)
                     }
                 }
             },
@@ -236,7 +236,7 @@ final class LivenessInstructionViewController: UIViewController {
                         let resultVC = EkycResultViewController()
                         self.navigationController?.pushViewController(resultVC, animated: true)
                     } else {
-                        self.showLivenessError(code: Int(error?.errorCode.rawValue ?? 0), message: error?.errorMessage ?? "")
+                        self.showMegviiError(code: Int(error?.errorCode.rawValue ?? 0), message: error?.errorMessage ?? "")
                     }
                 }
             },
@@ -244,31 +244,31 @@ final class LivenessInstructionViewController: UIViewController {
         )
     }
 
-    private func showLivenessError(code: Int, message: String) {
-        let title = code == Self.livenessUserCancel ? "Liveness Cancelled" : "Liveness Check Failed"
-        showAlert(title: title, message: describeLivenessError(code: code, message: message))
+    private func showMegviiError(code: Int, message: String) {
+        let title = code == Self.megviiUserCancel ? "Liveness Cancelled" : "Liveness Check Failed"
+        showAlert(title: title, message: describeMegviiError(code: code, message: message))
     }
 
-    private static let livenessUserCancel = 1011
-    private static let livenessNoCameraPermission = 1012
-    private static let livenessDeviceNotSupported: Set<Int> = [1004, 1009, 1013]
-    private static let livenessRetryable: Set<Int> = [1001, 1002, 1003, 1005, 1006, 1007, 1008, 1010, 1014, 1016, 1017, 1018, 1019]
+    private static let megviiUserCancel = 1011
+    private static let megviiNoCameraPermission = 1012
+    private static let megviiDeviceNotSupported: Set<Int> = [1004, 1009, 1013]
+    private static let megviiRetryable: Set<Int> = [1001, 1002, 1003, 1005, 1006, 1007, 1008, 1010, 1014, 1016, 1017, 1018, 1019]
 
-    // Same grouping as the ezSign Flutter app. The liveness engine validates its license against the host
+    // Same grouping as the ezSign Flutter app. Megvii validates its license against the host
     // app's bundle ID, so AUTHENTICATION_FAIL / bundleid_error names the rejected bundle ID.
-    private func describeLivenessError(code: Int, message: String) -> String {
+    private func describeMegviiError(code: Int, message: String) -> String {
         let upper = message.uppercased()
         let text: String
         if upper.contains("AUTHENTICATION_FAIL") || upper.contains("BUNDLEID") {
             let bundleId = Bundle.main.bundleIdentifier ?? "-"
             text = "The liveness license rejected \(bundleId). Register this bundle ID with the ezSign liveness license. (\(message))"
-        } else if code == Self.livenessUserCancel {
+        } else if code == Self.megviiUserCancel {
             return "Liveness has been cancelled"
-        } else if code == Self.livenessNoCameraPermission {
+        } else if code == Self.megviiNoCameraPermission {
             text = "Camera permission is required. Please allow camera access and try again."
-        } else if Self.livenessDeviceNotSupported.contains(code) {
+        } else if Self.megviiDeviceNotSupported.contains(code) {
             text = "Your device is currently not supported. Please try using a different device."
-        } else if Self.livenessRetryable.contains(code) {
+        } else if Self.megviiRetryable.contains(code) {
             text = "We couldn't complete the liveness check. Please try again in a few moments."
         } else if !message.isEmpty {
             text = message
