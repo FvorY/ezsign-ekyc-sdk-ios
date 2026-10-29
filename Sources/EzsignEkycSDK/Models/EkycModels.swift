@@ -9,7 +9,7 @@ public struct EkycConfig {
     public init(
         authToken: String,
         baseUrl: String = "https://gtm.myesign.id/api",
-        title: String = "Verifikasi Identitas",
+        title: String = "Your Identity",
         primaryColorHex: String = "#15C1E7"
     ) {
         self.authToken = authToken

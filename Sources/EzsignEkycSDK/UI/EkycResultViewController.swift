@@ -18,7 +18,7 @@ final class EkycResultViewController: UIViewController {
         view.backgroundColor = .white
         overrideUserInterfaceStyle = .light
         navigationItem.hidesBackButton = true
-        title = "Verifikasi"
+        title = "Verification"
 
         let shape = BackgroundShapeView(frame: CGRect(x: 0, y: -view.safeAreaInsets.top, width: view.bounds.width, height: 430))
         shape.autoresizingMask = [.flexibleWidth]
