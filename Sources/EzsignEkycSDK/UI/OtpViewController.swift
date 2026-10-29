@@ -132,8 +132,7 @@ final class OtpViewController: UIViewController {
     }
 
     @objc private func onSendOtpTapped() {
-        let phone = phoneField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        guard phone.count > 9 else {
+        guard let phone = PhoneNumber.normalize(phoneField.text ?? "") else {
             showAlert(title: "Perhatian", message: "Nomor handphone tidak valid.")
             return
         }
@@ -179,8 +178,13 @@ final class OtpViewController: UIViewController {
     }
 
     @objc private func onVerifyTapped() {
-        let phone = EkycSession.shared.phone.isEmpty ? (phoneField.text ?? "") : EkycSession.shared.phone
+        let phone = EkycSession.shared.phone
         let otp = otpField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+        guard !phone.isEmpty else {
+            showAlert(title: "Perhatian", message: "Kirim OTP terlebih dahulu.")
+            return
+        }
 
         guard otp.count == 6 else {
             showAlert(title: "Perhatian", message: "Masukkan 6 digit kode OTP.")
