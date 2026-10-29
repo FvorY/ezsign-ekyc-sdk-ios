@@ -29,7 +29,7 @@ SDK Android dengan API, alur, teks, dan kode error yang sama ada di [ezsign-ekyc
 
 ## Demo
 
-APK dan IPA demo tersedia di halaman [Releases](https://github.com/FvorY/ezsign-ekyc-sdk-ios/releases), versi terbaru [demo-ekyc-1.3](https://github.com/FvorY/ezsign-ekyc-sdk-ios/releases/tag/demo-ekyc-1.3).
+APK dan IPA demo tersedia di halaman [Releases](https://github.com/FvorY/ezsign-ekyc-sdk-ios/releases), versi terbaru [demo-ekyc-1.4](https://github.com/FvorY/ezsign-ekyc-sdk-ios/releases/tag/demo-ekyc-1.4).
 
 `ezSign-eKYC-iOS-unsigned.ipa` belum ditandatangani. Untuk memasangnya di iPhone, tandatangani dengan Apple ID Anda menggunakan Sideloadly atau AltStore:
 
