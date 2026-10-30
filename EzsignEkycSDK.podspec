@@ -16,7 +16,14 @@ Pod::Spec.new do |s|
   s.swift_versions   = ['5.9']
 
   s.source_files     = 'Sources/EzsignEkycSDK/**/*.swift'
-  s.resources        = ['Resources/**/*']
+  # List the liveness bundle as a whole: a recursive glob would copy its files flat into the
+  # framework, where text/ch and text/id hold files with the same name and the build fails.
+  s.resources        = [
+    'Resources/*.png',
+    'Resources/InterVariable.ttf',
+    'Resources/EkycAssets.xcassets',
+    'Resources/MegLiveV5Detect.bundle'
+  ]
   s.vendored_frameworks = 'Frameworks/MegLiveV5Detect.framework', 'Frameworks/MGFaceIDBaseKit.framework'
   s.frameworks       = 'UIKit', 'AVFoundation', 'CoreMedia', 'CoreMotion', 'SystemConfiguration', 'WebKit', 'MediaPlayer', 'ReplayKit'
   s.libraries        = 'c++'

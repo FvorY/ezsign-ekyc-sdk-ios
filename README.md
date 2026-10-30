@@ -59,7 +59,7 @@ APK dan IPA demo tersedia di halaman [Releases](https://github.com/FvorY/ezsign-
 | iOS minimum | 14.0 |
 | Xcode | 15.0+ |
 | Swift | 5.9+ |
-| Perangkat | iPhone fisik (arm64). Liveness engine tidak menyertakan slice Simulator. |
+| Perangkat | iPhone fisik (arm64). Liveness engine tidak menyertakan slice Simulator, sehingga **seluruh aplikasi host** tidak bisa di-build untuk Simulator selama SDK ini terpasang di target tersebut. Lihat [Troubleshooting](#troubleshooting). |
 | Orientasi | Portrait |
 | Jaringan | Akses HTTPS ke `baseUrl` ezSign dan ke layanan liveness (region Indonesia) |
 | Akun | Token sesi akun ezSign yang valid di environment yang dipakai |
@@ -392,8 +392,24 @@ Bundle ID yang tertulis di alert belum terdaftar di lisensi liveness ezSign. Kod
 **Aplikasi tertutup sendiri saat masuk ke kamera**
 `NSCameraUsageDescription` belum ada di `Info.plist` aplikasi host. Lihat [Konfigurasi Info.plist](#konfigurasi-infoplist).
 
-**Build gagal untuk Simulator (`building for iOS Simulator, but linking in object file built for iOS`)**
-Liveness engine hanya berisi arsitektur perangkat (arm64, armv7). Build dan jalankan di iPhone fisik.
+**Build gagal untuk Simulator (`While building for iOS Simulator, no library for this platform was found in '…MegLiveV5Detect.xcframework'`)**
+Liveness engine hanya berisi arsitektur perangkat, dan Xcode menolak build Simulator untuk setiap target yang menautkan SDK ini, termasuk layar aplikasi yang tidak memakai eKYC. Build dan jalankan di iPhone fisik.
+
+Bila tim Anda tetap perlu Simulator untuk bagian lain aplikasi, buat target aplikasi kedua (misalnya `MyApp-Sim`) yang tidak menautkan `EzsignEkycSDK`, lalu bungkus pemanggilan SDK dengan `canImport`:
+
+```swift
+#if canImport(EzsignEkycSDK)
+import EzsignEkycSDK
+#endif
+
+func startVerification(sessionToken: String) {
+    #if canImport(EzsignEkycSDK)
+    EzsignEkyc.start(from: self, config: EkycConfig(authToken: sessionToken)) { result in /* ... */ }
+    #else
+    showError("eKYC hanya tersedia di iPhone fisik")
+    #endif
+}
+```
 
 **`Undefined symbols` dari liveness engine saat link**
 Biasanya muncul bila framework liveness ditambahkan manual tanpa framework sistem yang dibutuhkan. Pasang SDK lewat SPM atau CocoaPods agar AVFoundation, CoreMedia, CoreMotion, SystemConfiguration, WebKit, MediaPlayer, ReplayKit, dan `libc++` ditautkan otomatis.
