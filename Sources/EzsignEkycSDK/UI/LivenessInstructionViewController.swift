@@ -212,6 +212,13 @@ final class LivenessInstructionViewController: UIViewController {
     }
 
     private func startLivenessEngine(bizToken: String) {
+        #if targetEnvironment(simulator)
+        // The liveness engine has no Simulator build; its Simulator slice only holds the headers.
+        showAlert(
+            title: "Liveness Check Failed",
+            message: "Liveness detection needs a physical iPhone. It cannot run in the iOS Simulator."
+        )
+        #else
         let config = MegLiveV5DetectInitConfigItem()
         config.phoneVertical = MegLiveV5DetectPhoneVerticalTypeDisable
         config.hostURL = "https://api-idn.megvii.com"
@@ -242,6 +249,7 @@ final class LivenessInstructionViewController: UIViewController {
             },
             dismissCallBack: {}
         )
+        #endif
     }
 
     private func showLivenessError(code: Int, message: String) {

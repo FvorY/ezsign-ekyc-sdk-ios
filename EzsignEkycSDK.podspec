@@ -24,7 +24,7 @@ Pod::Spec.new do |s|
     'Resources/EkycAssets.xcassets',
     'Resources/MegLiveV5Detect.bundle'
   ]
-  s.vendored_frameworks = 'Frameworks/MegLiveV5Detect.framework', 'Frameworks/MGFaceIDBaseKit.framework'
+  s.vendored_frameworks = 'Frameworks/MegLiveV5Detect.xcframework', 'Frameworks/MGFaceIDBaseKit.xcframework'
   s.frameworks       = 'UIKit', 'AVFoundation', 'CoreMedia', 'CoreMotion', 'SystemConfiguration', 'WebKit', 'MediaPlayer', 'ReplayKit'
   s.libraries        = 'c++'
 end
